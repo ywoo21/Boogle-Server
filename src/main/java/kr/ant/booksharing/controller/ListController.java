@@ -1,5 +1,6 @@
 package kr.ant.booksharing.controller;
 
+import kr.ant.booksharing.model.Book.BookReq;
 import kr.ant.booksharing.model.Book.BookRes;
 import kr.ant.booksharing.model.DefaultRes;
 import kr.ant.booksharing.service.ListService;
@@ -14,9 +15,6 @@ import static kr.ant.booksharing.model.DefaultRes.FAIL_DEFAULT_RES;
 
 @Slf4j
 @RestController
-@RequestMapping("/list")
-@CrossOrigin
-
 public class ListController {
 
     //@NonNull
@@ -30,6 +28,7 @@ public class ListController {
      * 생성자가 1개일 경우 @Autowired 생략 가능
      * @param listService 서비스
      */
+
     public ListController(final ListService listService) {
         this.listService = listService;
     }
@@ -39,8 +38,8 @@ public class ListController {
      *
      * @return ResponseEntity
      */
-    @GetMapping("")
-    public ResponseEntity getAllBoards() {
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public ResponseEntity getAllBooks() {
         try {
             DefaultRes<List<BookRes>> defaultRes = listService.findAllBook();
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
@@ -53,10 +52,10 @@ public class ListController {
     /**
      * 검색 된 책 목록 조회
      *
-     * @return ResponseEntity
+     * @return ResponseEntitz
      */
-    @RequestMapping("/search")
-    public ResponseEntity getSearchedBoards(@RequestParam(value="keyword", defaultValue="") String keyword) {
+    @RequestMapping("list/search")
+    public ResponseEntity getSearchedBooks(@RequestParam(value="keyword", defaultValue="") String keyword) {
         try {
             DefaultRes<List<BookRes>> defaultRes = listService.findSearchedBook(keyword);
             return new ResponseEntity<>(defaultRes, HttpStatus.OK);
@@ -66,5 +65,19 @@ public class ListController {
         }
     }
 
-
+    /**
+     * 보드 저장
+     *
+     * @param bookReq 책 데이터
+     * @return ResponseEntity
+     */
+    @RequestMapping(value = "/list/save", method=RequestMethod.POST)
+    public ResponseEntity saveBook(@RequestBody final BookReq bookReq) {
+        try {
+            return new ResponseEntity<>(listService.saveBook(bookReq), HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("{}", e);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
 }

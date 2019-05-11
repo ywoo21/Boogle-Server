@@ -6,6 +6,16 @@ import lombok.ToString;
 
 
 public class Book {
+
+    @Getter
+    @Setter
+    @ToString
+    public static class BookReq {
+        private int id;
+        private String title;
+        private String price;
+    }
+
     @Getter
     @Setter
     @ToString
