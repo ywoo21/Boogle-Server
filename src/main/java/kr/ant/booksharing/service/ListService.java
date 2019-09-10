@@ -211,7 +211,7 @@ public class ListService {
     public DefaultRes updateBuyTransaction(final String email, int bookId) {
         try {
             final int state = listMapper.findTransStateByBookId(bookId);
-            if(state == 1) listMapper.updateBuyState(bookId); // 상태가 2일 때만 증가시킨다.
+            if(state == 1) listMapper.updateBuyState(bookId); // 상태가 1일 때만 증가시킨다.
             return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_BOARD);
         } catch (Exception e) {
             log.error("{}",e);

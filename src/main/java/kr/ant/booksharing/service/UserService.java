@@ -1,7 +1,6 @@
 package kr.ant.booksharing.service;
 
 import kr.ant.booksharing.dao.UserMapper;
-import kr.ant.booksharing.model.Book;
 import kr.ant.booksharing.model.DefaultRes;
 import kr.ant.booksharing.model.SignIn.SignInRes;
 import kr.ant.booksharing.model.SignIn.SignInReq;
@@ -11,8 +10,6 @@ import kr.ant.booksharing.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -34,7 +31,7 @@ public class UserService {
     /**
      * 회원 정보 저장
      *
-     * @param signUpReq 회원 데이터
+     * @param signUpReq 회원 가입 데이터
      * @return DefaultRes
      */
     public DefaultRes saveUser(final SignUpReq signUpReq) {
@@ -82,7 +79,7 @@ public class UserService {
     /**
      * 이메일 중복 검사
      *
-     * @param email 회원 데이터
+     * @param email 회원 이메일
      * @return DefaultRes
      */
     public DefaultRes checkEmail(final String email) {

@@ -23,13 +23,14 @@ import static kr.ant.booksharing.model.DefaultRes.FAIL_DEFAULT_RES;
 
 @Slf4j
 @RestController
+@RequestMapping("naver/bookApi")
 public class NaverBookApiController {
 
     static final String clientId = "Uu3ZOIKWPC7H2xIE45QX";//애플리케이션 클라이언트 아이디값";
     static final String clientSecret = "gfEQG2XKng";//애플리케이션 클라이언트 시크릿값";
 
 
-    @GetMapping("/bookApi")
+    @GetMapping("/")
     public ResponseEntity getAllBooks(@RequestParam(value="keyword", defaultValue="") String keyword) {
         try {
             String text = URLEncoder.encode(keyword, "UTF-8");
@@ -61,7 +62,7 @@ public class NaverBookApiController {
         }
     }
 
-    @GetMapping("/bookApiAdv")
+    @GetMapping("adv")
     public ResponseEntity getAllBooksAdv(@RequestParam(value="isbn", defaultValue="") String isbn) {
         try {
             String text = URLEncoder.encode(isbn, "UTF-8");

@@ -1,6 +1,5 @@
 package kr.ant.booksharing.controller;
 
-import kr.ant.booksharing.model.Book;
 import kr.ant.booksharing.model.SignIn.SignInReq;
 import kr.ant.booksharing.model.SignUp.SignUpReq;
 import kr.ant.booksharing.service.UserService;
@@ -13,6 +12,7 @@ import static kr.ant.booksharing.model.DefaultRes.FAIL_DEFAULT_RES;
 
 @Slf4j
 @RestController
+@RequestMapping("users")
 public class UserController {
 
     private final UserService userService;
@@ -27,7 +27,7 @@ public class UserController {
      * @param signUpReq 회원 데이터
      * @return ResponseEntity
      */
-    @RequestMapping(value = "/signup", method= RequestMethod.POST)
+    @PostMapping("signup")
     public ResponseEntity signup(@RequestBody final SignUpReq signUpReq) {
         try {
             return new ResponseEntity<>(userService.saveUser(signUpReq), HttpStatus.OK);
@@ -38,12 +38,12 @@ public class UserController {
     }
 
     /**
-     * 중복체크
+     * 회원가입 이메일 중복체크
      *
-     * @param email 회원 데이터
+     * @param email 회원 이메일
      * @return ResponseEntity
      */
-    @RequestMapping(value = "signup/validateEmail", method= RequestMethod.GET)
+    @GetMapping("signup/validateEmail")
     public ResponseEntity signup(@RequestParam("email") final String email) {
         try {
             return new ResponseEntity<>(userService.checkEmail(email), HttpStatus.OK);
@@ -59,7 +59,7 @@ public class UserController {
      * @param signInReq 회원 데이터
      * @return ResponseEntity
      */
-    @RequestMapping(value = "/signin", method= RequestMethod.POST)
+    @PostMapping("/signin")
     public ResponseEntity signin(@RequestBody final SignInReq signInReq) {
         try {
             return new ResponseEntity<>(userService.authUser(signInReq), HttpStatus.OK);
