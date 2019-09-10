@@ -29,3 +29,10 @@ Boogle Server App Repository
 | GET    | /myPage/sellList?email={email}  | 마이페이지 판매 목록 조회        |                    |
 | POST   | /myPage/buyList/updateState     | 마이페이지 구매 상태 변경        | state 1 -> state 2 |
 | DELETE | /myPage/buyList?bookId={bookId} | 마이페이지 등록된 판매 도서 삭제 |                    |
+
+## NAVER BOOK API
+
+| 메소드 | 경로                             | 설명                                 |
+| ------ | -------------------------------- | ------------------------------------ |
+| GET    | /naver/bookApi?keyword={keyword} | 네이버 도서 검색 API 일반 검색(제목) |
+| GET    | /naver/bookApi/adv?isbn={isbn}   | 네이버 도서 검색 API 상세 검색(ISBN) |
