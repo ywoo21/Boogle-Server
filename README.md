@@ -43,3 +43,14 @@ Boogle Server App Repository
 
 ![북을_ERD](https://user-images.githubusercontent.com/23696493/64671045-2742f200-d4a2-11e9-863e-014acd1bde87.png)
 
+## API DOCUMENT
+
+#### BASE URL : 13.125.191.60:8080
+---
+#### [회원(USERS) API](https://github.com/ywoo21/Boogle-Server/wiki/회원(USERS)-API)
+#### [판매/구매 도서 목록(LISTS) API](https://github.com/ywoo21/Boogle-Server/wiki/%ED%8C%90%EB%A7%A4-%EA%B5%AC%EB%A7%A4-%EB%8F%84%EC%84%9C-%EB%AA%A9%EB%A1%9D(LISTS))
+#### [마이페이지(MY PAGE) API](https://github.com/ywoo21/Boogle-Server/wiki/마이페이지(MY-PAGE)-API)
+#### [네이버 도서 검색(NAVER BOOK API) API]()
+
+
+
