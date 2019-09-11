@@ -39,10 +39,10 @@ public class UserService {
             String encodedPassword = passwordEncoder.encode(signUpReq.getPassword());
             signUpReq.setPassword(encodedPassword);
             userMapper.saveUser(signUpReq);
-            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_BOARD);
+            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATED_USER);
         } catch (Exception e) {
             System.out.println(e);
-            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
+            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.FAIL_CREATE_USER);
         }
     }
 
@@ -64,10 +64,10 @@ public class UserService {
 
                     return DefaultRes.res(StatusCode.CREATED, ResponseMessage.LOGIN_SUCCESS,signInRes);
                 }
-                else { return DefaultRes.res(StatusCode.NO_CONTENT, ResponseMessage.LOGIN_FAIL); }
+                else { return DefaultRes.res(StatusCode.FORBIDDEN, ResponseMessage.LOGIN_FAIL); }
             }
             else{
-                return DefaultRes.res(StatusCode.NO_CONTENT, ResponseMessage.LOGIN_FAIL);
+                return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
             }
 
 

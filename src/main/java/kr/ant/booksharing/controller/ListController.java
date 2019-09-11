@@ -46,7 +46,7 @@ public class ListController {
      *
      * @return ResponseEntity
      */
-    @RequestMapping("searches")
+    @GetMapping("searches")
     public ResponseEntity getSearchedBooks(@RequestParam(value="keyword", defaultValue="") String keyword) {
         try {
             DefaultRes<List<BookRes>> defaultRes = listService.findSearchedBook(keyword);

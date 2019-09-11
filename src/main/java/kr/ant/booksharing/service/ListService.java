@@ -41,15 +41,15 @@ public class ListService {
     public DefaultRes<List<BookRes>> findAllBook() {
         final List<BookRes> books = listMapper.findAllBook();
         if (books.isEmpty()) {
-            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_SELL_ITEM);
         }
-        return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_ALL_BOARDS, books);
+        return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_ALL_SELL_ITEMS, books);
     }
 
     /**
      * 검색된 책 목록 조회
      *
-     * @param
+     * @param keyword 검색 키워드
      * @return DefaultRes
      */
     public DefaultRes<List<BookRes>> findSearchedBook(final String keyword) {
@@ -63,9 +63,9 @@ public class ListService {
         }
 
         if (books.isEmpty()) {
-            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_SEARCHED_SELL_ITEM);
         }
-        return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_ALL_BOARDS, books);
+        return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_ALL_SEARCHED_SELL_ITEMS, books);
     }
 
     /**
@@ -80,9 +80,9 @@ public class ListService {
         book = listMapper.findBookByBookId(bookId);
 
         if (book == null) {
-            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD);
+            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_SELL_ITEM);
         }
-        return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_ALL_BOARDS, book);
+        return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_SELL_ITEM, book);
     }
 
     /**
@@ -119,10 +119,10 @@ public class ListService {
             bookReq.setQuality(String.valueOf(totalScore));
 
             listMapper.saveBook(bookReq);
-            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_BOARD);
+            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_SELL_ITEM);
         } catch (Exception e) {
             log.error("{}",e);
-            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
+            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.FAIL_CREATE_SELL_ITEM);
         }
     }
     /**
@@ -138,10 +138,10 @@ public class ListService {
 
             transactionReq.setBuyerId(buyerId);
             listMapper.saveTransaction(transactionReq);
-            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_BOARD);
+            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_BUY_ITEM);
         } catch (Exception e) {
             log.error("{}",e);
-            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
+            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.FAIL_CREATE_BUY_ITEM);
         }
     }
 
@@ -158,7 +158,7 @@ public class ListService {
             List <Timestamp> date = listMapper.findTransDateByBuyerId(userId);
             List <Integer> state = listMapper.findTransStateByBuyerId(userId);
 
-            if(bookId.isEmpty() || date == null){ return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD); }
+            if(bookId.isEmpty() || date == null){ return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BUY_ITEM); }
             else{
                 List <BookRes> buyList = new ArrayList<>();
                 for(Integer id : bookId){
@@ -171,9 +171,9 @@ public class ListService {
                     String sellerPhoneNumber = userMapper.findUserPhoneNumberByUserId(buyList.get(i).getSellerId());
                     buyList.get(i).setSellerPhoneNumber(sellerPhoneNumber);
                 }
-                if(buyList.isEmpty()){ return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD); }
+                if(buyList.isEmpty()){ return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BUY_ITEM); }
                 else{
-                    return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_ALL_BOARDS, buyList);
+                    return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_BUY_ITEM, buyList);
                 }
             }
         } catch (Exception e) {
@@ -192,9 +192,9 @@ public class ListService {
         try {
             int userId  = userMapper.findUserIdByUserEmail(email);
             List<BookRes> buyList = listMapper.findBookIdBySellerId(userId);
-            if(buyList.isEmpty()){ return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_BOARD); }
+            if(buyList.isEmpty()){ return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_SELL_ITEM); }
             else{
-                return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_ALL_BOARDS, buyList);
+                return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_ALL_SELL_ITEMS, buyList);
             }
         } catch (Exception e) {
             log.error("{}",e);
@@ -212,10 +212,10 @@ public class ListService {
         try {
             final int state = listMapper.findTransStateByBookId(bookId);
             if(state == 1) listMapper.updateBuyState(bookId); // 상태가 1일 때만 증가시킨다.
-            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_BOARD);
+            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.UPDATE_BUY_ITEM);
         } catch (Exception e) {
             log.error("{}",e);
-            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
+            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.FAIL_UPDATE_BUY_ITEM);
         }
     }
 
@@ -230,10 +230,10 @@ public class ListService {
             final int state = listMapper.findBookStateByBookId(bookId);
             if(state == 1) listMapper.updateBuyState(bookId);
             listMapper.updateSellState(bookId);
-            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_BOARD);
+            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.UPDATE_SELL_ITEM);
         } catch (Exception e) {
             log.error("{}",e);
-            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
+            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.FAIL_UPDATE_SELL_ITEM);
         }
     }
 
@@ -246,10 +246,10 @@ public class ListService {
     public DefaultRes deleteBook(int bookId) {
         try {
             listMapper.deleteBook(bookId);
-            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATE_BOARD);
+            return DefaultRes.res(StatusCode.OK, ResponseMessage.DELETE_SELL_ITEM);
         } catch (Exception e) {
             log.error("{}",e);
-            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
+            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.FAIL_DELETE_SELL_ITEM);
         }
     }
 }
