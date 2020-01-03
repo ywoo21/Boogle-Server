@@ -8,7 +8,6 @@ import kr.ant.booksharing.model.Book.BookRes;
 import kr.ant.booksharing.model.DefaultRes;
 
 import kr.ant.booksharing.model.Transaction.TransactionReq;
-import kr.ant.booksharing.model.Transaction.TransactionRes;
 
 import kr.ant.booksharing.utils.ResponseMessage;
 import kr.ant.booksharing.utils.StatusCode;

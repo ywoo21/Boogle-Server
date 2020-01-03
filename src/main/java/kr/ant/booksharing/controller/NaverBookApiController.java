@@ -1,9 +1,13 @@
 package kr.ant.booksharing.controller;
 
+import kr.ant.booksharing.dao.ItemMapper;
 import kr.ant.booksharing.model.Book;
 import kr.ant.booksharing.model.DefaultRes;
+import kr.ant.booksharing.model.Item.ItemRes;
 import kr.ant.booksharing.service.ListService;
+import kr.ant.booksharing.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.XML;
 import org.springframework.http.HttpHeaders;
@@ -28,12 +32,18 @@ public class NaverBookApiController {
     static final String clientId = "Uu3ZOIKWPC7H2xIE45QX";//애플리케이션 클라이언트 아이디값";
     static final String clientSecret = "gfEQG2XKng";//애플리케이션 클라이언트 시크릿값";
 
+    private final ItemMapper itemMapper;
+
+    public NaverBookApiController(final ItemMapper itemMapper) {
+        this.itemMapper = itemMapper;
+    }
+
 
     @GetMapping("naver/bookApi")
     public ResponseEntity getAllBooks(@RequestParam(value="keyword", defaultValue="") String keyword) {
         try {
             String text = URLEncoder.encode(keyword, "UTF-8");
-            String apiURL = "https://openapi.naver.com/v1/search/book.json?query="+ text+"&display=30"; // json 결과
+            String apiURL = "https://openapi.naver.com/v1/search/book.xml?query="+ text+"&display=30"; // json 결과
             //String apiURL = "https://openapi.naver.com/v1/search/blog.xml?query="+ text; // xml 결과
             URL url = new URL(apiURL);
             HttpURLConnection con = (HttpURLConnection)url.openConnection();
@@ -53,8 +63,38 @@ public class NaverBookApiController {
                 response.append(inputLine);
             }
             br.close();
-            System.out.println(response);
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            JSONObject jsonObject = XML.toJSONObject(response.toString());
+
+            JSONObject rss;
+            if(jsonObject.getJSONObject("rss") != null){
+                rss = jsonObject.getJSONObject("rss");
+            }
+            else{
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            JSONArray jsonArray =
+                    rss.getJSONObject("channel").getJSONArray("item");
+
+            for(int i = 0; i < jsonArray.length(); i++){
+                String isbnOfSearchedResult = jsonArray.getJSONObject(i)
+                        .getString("isbn").split(" ")[1];
+                String lowestPrice = "";
+                int registeredCount = 0;
+                int itemId = 0;
+
+                if(itemMapper.findAllByIsbn(isbnOfSearchedResult).isPresent()){
+                    ItemRes itemRes = itemMapper.findAllByIsbn(isbnOfSearchedResult).get();
+                    lowestPrice = itemRes.getLowestPrice();
+                    registeredCount = itemRes.getRegisteredCount();
+                    itemId = itemRes.getItemId();
+                }
+                jsonArray.getJSONObject(i).put("lowestPrice", lowestPrice);
+                jsonArray.getJSONObject(i).put("registeredCount", registeredCount);
+                jsonArray.getJSONObject(i).put("itemId", itemId);
+            }
+
+
+            return new ResponseEntity<>(jsonObject.toString(), HttpStatus.OK);
         } catch (Exception e) {
             System.out.println(e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);

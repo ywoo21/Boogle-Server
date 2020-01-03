@@ -68,4 +68,20 @@ public class UserController {
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
+
+    /**
+     * 비밀번호 찾기
+     *
+     * @param signInReq 회원 데이터
+     * @return ResponseEntity
+     */
+    @PostMapping("/change/password")
+    public ResponseEntity changePassword(@RequestBody SignInReq signInReq) {
+        try {
+            return new ResponseEntity<>(userService.modifyPassword(signInReq), HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("{}", e);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
 }

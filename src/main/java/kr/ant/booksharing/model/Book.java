@@ -16,11 +16,11 @@ public class Book {
     public static class BookReq {
         private int id;
         private String title;
-        private String price;
+        private int price;
         private String author;
         private String publisher;
         private String imageUrl;
-        private String regiPrice;
+        private int regiPrice;
         private String quality;
         private String deal;
         private List<String> place;
@@ -34,6 +34,7 @@ public class Book {
         private String doodle;
         private String damage;
         private String colored;
+        private String isbn;
     }
 
     @Getter
@@ -42,11 +43,11 @@ public class Book {
     public static class BookRes {
         private int id;
         private String title;
-        private String price;
+        private int price;
         private String author;
         private String publisher;
         private String imageUrl;
-        private String regiPrice;
+        private int regiPrice;
         private String quality;
         private String deal;
         private String place;
@@ -61,7 +62,7 @@ public class Book {
         private String doodle;
         private String damage;
         private String colored;
-
+        private String isbn;
     }
 }
 

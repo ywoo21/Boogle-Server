@@ -12,7 +12,7 @@ import java.util.List;
 public interface ListMapper {
 
     // 책 목록 전체 조회
-    @Select("SELECT * FROM sell_item")
+    @Select("SELECT * FROM sell_item_original")
     @Results(value = {
             @Result(property = "id", column = "id"),
             @Result(property = "title", column = "title"),
@@ -36,8 +36,83 @@ public interface ListMapper {
     })
     public List<BookRes> findAllBook();
 
+    // 최근 등록 책 목록 조회(5개)
+    @Select("SELECT * FROM sell_item_original ORDER BY id DESC LIMIT 4")
+    @Results(value = {
+            @Result(property = "id", column = "id"),
+            @Result(property = "title", column = "title"),
+            @Result(property = "price", column = "price"),
+            @Result(property = "imageUrl", column = "image_url"),
+            @Result(property = "author", column = "author"),
+            @Result(property = "publisher", column = "publisher"),
+            @Result(property = "regiPrice", column = "regi_price"),
+            @Result(property = "quality", column = "quality"),
+            @Result(property = "deal", column = "deal"),
+            @Result(property = "place", column = "place"),
+            @Result(property = "sellerId", column = "seller_id"),
+            @Result(property = "boxNumber", column = "box_number"),
+            @Result(property = "boxPassword", column = "box_password"),
+            @Result(property = "date", column = "date"),
+            @Result(property = "state", column = "state"),
+            @Result(property = "doodle", column = "doodle"),
+            @Result(property = "damage", column = "damage"),
+            @Result(property = "colored", column = "colored"),
+
+    })
+    public List<BookRes> findRecentBook();
+
+    // 저가 순 책 목록 조회(5개)
+    @Select("SELECT * FROM sell_item_original ORDER BY regi_price LIMIT 4")
+    @Results(value = {
+            @Result(property = "id", column = "id"),
+            @Result(property = "title", column = "title"),
+            @Result(property = "price", column = "price"),
+            @Result(property = "imageUrl", column = "image_url"),
+            @Result(property = "author", column = "author"),
+            @Result(property = "publisher", column = "publisher"),
+            @Result(property = "regiPrice", column = "regi_price"),
+            @Result(property = "quality", column = "quality"),
+            @Result(property = "deal", column = "deal"),
+            @Result(property = "place", column = "place"),
+            @Result(property = "sellerId", column = "seller_id"),
+            @Result(property = "boxNumber", column = "box_number"),
+            @Result(property = "boxPassword", column = "box_password"),
+            @Result(property = "date", column = "date"),
+            @Result(property = "state", column = "state"),
+            @Result(property = "doodle", column = "doodle"),
+            @Result(property = "damage", column = "damage"),
+            @Result(property = "colored", column = "colored"),
+
+    })
+    public List<BookRes> findLeastPriceBook();
+
+    // 등록 수 순 책 목록 조회(5개)
+    @Select("SELECT * FROM sell_item_original GROUP BY title ORDER BY COUNT(title) DESC LIMIT 4")
+    @Results(value = {
+            @Result(property = "id", column = "id"),
+            @Result(property = "title", column = "title"),
+            @Result(property = "price", column = "price"),
+            @Result(property = "imageUrl", column = "image_url"),
+            @Result(property = "author", column = "author"),
+            @Result(property = "publisher", column = "publisher"),
+            @Result(property = "regiPrice", column = "regi_price"),
+            @Result(property = "quality", column = "quality"),
+            @Result(property = "deal", column = "deal"),
+            @Result(property = "place", column = "place"),
+            @Result(property = "sellerId", column = "seller_id"),
+            @Result(property = "boxNumber", column = "box_number"),
+            @Result(property = "boxPassword", column = "box_password"),
+            @Result(property = "date", column = "date"),
+            @Result(property = "state", column = "state"),
+            @Result(property = "doodle", column = "doodle"),
+            @Result(property = "damage", column = "damage"),
+            @Result(property = "colored", column = "colored"),
+
+    })
+    public List<BookRes> findMostRegisteredBook();
+
     // 키워드에 해당하는 책 목록 조회
-    @Select("SELECT * FROM sell_item WHERE title LIKE CONCAT('%',#{keyword},'%')")
+    @Select("SELECT * FROM sell_item_original WHERE title LIKE CONCAT('%',#{keyword},'%')")
     @Results(value = {
             @Result(property = "id", column = "id"),
             @Result(property = "title", column = "title"),
@@ -61,7 +136,7 @@ public interface ListMapper {
     public List<BookRes> findSearchedBook(@Param("keyword") final String keyword);
 
     // 책 id에 해당하는 책 목록 조회
-    @Select("SELECT * FROM sell_item WHERE id = #{bookId}")
+    @Select("SELECT * FROM sell_item_original WHERE id = #{bookId}")
     @Results(value = {
             @Result(property = "id", column = "id"),
             @Result(property = "title", column = "title"),
@@ -85,7 +160,7 @@ public interface ListMapper {
     public BookRes findBookByBookId(@Param("bookId") final int bookId);
 
     // 책 정보 저장
-    @Insert("INSERT INTO sell_item(id, title, price, author, publisher, image_url, regi_price, quality, deal, place, seller_id, box_number, box_password, doodle, damage, colored) VALUES(#{bookReq.id}, " +
+    @Insert("INSERT INTO sell_item_original(id, title, price, author, publisher, image_url, regi_price, quality, deal, place, seller_id, box_number, box_password, doodle, damage, colored) VALUES(#{bookReq.id}, " +
             "#{bookReq.title}, #{bookReq.price}, #{bookReq.author}, #{bookReq.publisher}, #{bookReq.imageUrl}, " +
             "#{bookReq.regiPrice}, #{bookReq.quality}, #{bookReq.deal}, #{bookReq.placeToString}, #{bookReq.sellerId}," +
             " #{bookReq.boxNumber}, #{bookReq.boxPassword}, #{bookReq.doodle}, #{bookReq.damage},#{bookReq.colored})")
@@ -120,7 +195,7 @@ public interface ListMapper {
     public List<Integer> findBookIdByBuyerId(@Param("userId") final int userId);
 
     // 판매자 id로 책 id 조회
-    @Select("SELECT * FROM sell_item WHERE seller_id = #{userId}")
+    @Select("SELECT * FROM sell_item_original WHERE seller_id = #{userId}")
     @Results(value = {
             @Result(property = "id", column = "id"),
             @Result(property = "title", column = "title"),
@@ -155,17 +230,17 @@ public interface ListMapper {
     public int findTransStateByBookId(@Param("bookId") final int bookId);
 
     // 책 id로 판매 상태 조회
-    @Select("SELECT * FROM sell_item WHERE id = #{bookId}")
+    @Select("SELECT * FROM sell_item_original WHERE id = #{bookId}")
     @Results(value = {
             @Result(property = "state", column = "state")
     })
     public int findBookStateByBookId(@Param("bookId") final int bookId);
 
     // 판매 상태 증가
-    @Update("UPDATE sell_item SET state = state + 1 WHERE id = #{bookId}")
+    @Update("UPDATE sell_item_original SET state = state + 1 WHERE id = #{bookId}")
     void updateSellState(@Param("bookId") final int bookId);
 
     // 판매 책 삭제
-    @Update("DELETE FROM sell_item WHERE id = #{bookId}")
+    @Update("DELETE FROM sell_item_original WHERE id = #{bookId}")
     void deleteBook(@Param("bookId") final int bookId);
 }

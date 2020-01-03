@@ -95,4 +95,20 @@ public class UserService {
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
         }
     }
+
+    /**
+     * 회원 비밀번호 변경
+     *
+     * @param signInReq 회원 이메일
+     * @return DefaultRes
+     */
+    public DefaultRes modifyPassword(final SignInReq signInReq) {
+        try {
+            userMapper.changeUserPassword(signInReq.getEmail(), passwordEncoder.encode(signInReq.getPassword()));
+            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CHANGED_PWD);
+        } catch (Exception e) {
+            System.out.println(e);
+            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
+        }
+    }
 }

@@ -53,4 +53,8 @@ public interface UserMapper {
     })
     public String findUserPhoneNumberByUserId(@Param("id") final int id);
 
+    // 회원 id로 회원 전화번호
+    @Update("UPDATE user SET password = #{password} WHERE email = #{email}")
+    public void changeUserPassword(@Param("email") final String email, final String password);
+
 }
