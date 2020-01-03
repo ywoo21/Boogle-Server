@@ -20,7 +20,6 @@ import static kr.ant.booksharing.model.DefaultRes.FAIL_DEFAULT_RES;
 public class ListController {
 
     private final ListService listService;
-
     public ListController(final ListService listService) {
         this.listService = listService;
     }
