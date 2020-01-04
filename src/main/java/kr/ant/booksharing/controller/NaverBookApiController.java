@@ -1,27 +1,20 @@
 package kr.ant.booksharing.controller;
 
 import kr.ant.booksharing.dao.ItemMapper;
-import kr.ant.booksharing.model.Book;
-import kr.ant.booksharing.model.DefaultRes;
 import kr.ant.booksharing.model.Item.ItemRes;
-import kr.ant.booksharing.service.ListService;
-import kr.ant.booksharing.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.XML;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.List;
 
 import static kr.ant.booksharing.model.DefaultRes.FAIL_DEFAULT_RES;
 

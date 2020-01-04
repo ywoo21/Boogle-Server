@@ -1,8 +1,5 @@
 package kr.ant.booksharing.controller;
 
-import kr.ant.booksharing.model.Book;
-import kr.ant.booksharing.model.DefaultRes;
-import kr.ant.booksharing.service.ListService;
 import kr.ant.booksharing.service.SellItemService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
