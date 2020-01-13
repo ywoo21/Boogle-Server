@@ -1,7 +1,9 @@
 package kr.ant.booksharing.controller;
 
 import kr.ant.booksharing.dao.ItemMapper;
+import kr.ant.booksharing.domain.SellItem;
 import kr.ant.booksharing.model.Item.ItemRes;
+import kr.ant.booksharing.repository.SellItemRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -15,6 +17,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.List;
 
 import static kr.ant.booksharing.model.DefaultRes.FAIL_DEFAULT_RES;
 
@@ -26,9 +29,12 @@ public class NaverBookApiController {
     static final String clientSecret = "gfEQG2XKng";//애플리케이션 클라이언트 시크릿값";
 
     private final ItemMapper itemMapper;
+    private final SellItemRepository sellItemRepository;
 
-    public NaverBookApiController(final ItemMapper itemMapper) {
+    public NaverBookApiController(final ItemMapper itemMapper,
+                                  final SellItemRepository sellItemRepository) {
         this.itemMapper = itemMapper;
+        this.sellItemRepository = sellItemRepository;
     }
 
 
@@ -73,13 +79,18 @@ public class NaverBookApiController {
                         .getString("isbn").split(" ")[1];
                 String lowestPrice = "";
                 int registeredCount = 0;
-                int itemId = 0;
+                String itemId = "";
 
-                if(itemMapper.findAllByIsbn(isbnOfSearchedResult).isPresent()){
-                    ItemRes itemRes = itemMapper.findAllByIsbn(isbnOfSearchedResult).get();
-                    lowestPrice = itemRes.getLowestPrice();
-                    registeredCount = itemRes.getRegisteredCount();
-                    itemId = itemRes.getItemId();
+                if(sellItemRepository.findAllByItemId(isbnOfSearchedResult).isPresent()){
+                    List<SellItem> sellItemList = sellItemRepository.findAllByItemId(isbnOfSearchedResult).get();
+                    int lowest = Integer.parseInt(sellItemList.get(0).getPrice());
+                    for(SellItem sellItem : sellItemList){
+                        int price = Integer.parseInt(sellItem.getPrice());
+                        if(price < lowest) lowest = price;
+                    }
+                    lowestPrice = String.valueOf(lowest);
+                    registeredCount = sellItemList.size();
+                    itemId = isbnOfSearchedResult;
                 }
                 jsonArray.getJSONObject(i).put("lowestPrice", lowestPrice);
                 jsonArray.getJSONObject(i).put("registeredCount", registeredCount);

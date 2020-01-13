@@ -1,10 +1,12 @@
 package kr.ant.booksharing.service;
 
 import kr.ant.booksharing.dao.UserMapper;
+import kr.ant.booksharing.domain.User;
 import kr.ant.booksharing.model.DefaultRes;
 import kr.ant.booksharing.model.SignIn.SignInRes;
 import kr.ant.booksharing.model.SignIn.SignInReq;
 import kr.ant.booksharing.model.SignUp.SignUpReq;
+import kr.ant.booksharing.repository.UserRepository;
 import kr.ant.booksharing.utils.ResponseMessage;
 import kr.ant.booksharing.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
@@ -16,33 +18,35 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserMapper userMapper;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
     public UserService(final UserMapper userMapper, final PasswordEncoder passwordEncoder,
-                       final JwtService jwtService) {
+                       final UserRepository userRepository, final JwtService jwtService) {
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
+        this.userRepository = userRepository;
         this.jwtService = jwtService;
-
     }
 
 
     /**
      * 회원 정보 저장
      *
-     * @param signUpReq 회원 가입 데이터
+     * @param user 회원
      * @return DefaultRes
      */
-    public DefaultRes saveUser(final SignUpReq signUpReq) {
+    public DefaultRes saveUser(final User user) {
         try {
-            String encodedPassword = passwordEncoder.encode(signUpReq.getPassword());
-            signUpReq.setPassword(encodedPassword);
-            userMapper.saveUser(signUpReq);
-            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATED_USER);
+            String encodedPassword = passwordEncoder.encode(user.getPassword());
+            user.setPassword(encodedPassword);
+            System.out.println(user.toString());
+            userRepository.save(user);
+            return DefaultRes.res(StatusCode.CREATED, "회원 정보 저장 성공");
         } catch (Exception e) {
             System.out.println(e);
-            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.FAIL_CREATE_USER);
+            return DefaultRes.res(StatusCode.DB_ERROR, "회원 정보 저장 실패");
         }
     }
 

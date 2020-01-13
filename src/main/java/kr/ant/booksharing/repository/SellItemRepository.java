@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SellItemRepository extends JpaRepository<SellItem, Integer> {
-    Optional<List<SellItem>> findAllByItemId(int ItemId);
+    Optional<List<SellItem>> findAllById(int id);
+    Optional<List<SellItem>> findAllByItemId(String itemId);
+
 }
 
 
