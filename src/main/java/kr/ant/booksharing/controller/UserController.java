@@ -1,5 +1,6 @@
 package kr.ant.booksharing.controller;
 
+import kr.ant.booksharing.domain.User;
 import kr.ant.booksharing.model.SignIn.SignInReq;
 import kr.ant.booksharing.model.SignUp.SignUpReq;
 import kr.ant.booksharing.service.UserService;
@@ -24,13 +25,13 @@ public class UserController {
     /**
      * 회원가입
      *
-     * @param signUpReq 회원 데이터
+     * @param user 회원 데이터
      * @return ResponseEntity
      */
     @PostMapping("signup")
-    public ResponseEntity signup(@RequestBody final SignUpReq signUpReq) {
+    public ResponseEntity signup(@RequestBody final User user) {
         try {
-            return new ResponseEntity<>(userService.saveUser(signUpReq), HttpStatus.OK);
+            return new ResponseEntity<>(userService.saveUser(user), HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

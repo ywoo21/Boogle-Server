@@ -3,7 +3,7 @@ package kr.ant.booksharing.domain;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.sql.Date;
 
 @Data
 @Entity
@@ -13,10 +13,19 @@ public class SellItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private int itemId;
+    private String itemId;
+    private String title;
+    private String author;
+    private String publisher;
+    private String pubdate;
+    private String imageUrl;
+    private String price;
     private String regiPrice;
-    private int quality;
-    private String deal;
-    private Timestamp date;
-    private int state;
+    private int dealType;
+    private int contactType;
+    private String qualityIn;
+    private String qualityOut;
+    private int sellerId;
+    private Date regiTime;
+    private String comment;
 }
