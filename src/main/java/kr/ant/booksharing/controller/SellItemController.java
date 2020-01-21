@@ -28,14 +28,14 @@ public class SellItemController {
     }
 
     /**
-     * 판매 도서 조회
+     * 판매 상품 조회
      *
      * @return ResponseEntity
      */
     @GetMapping("")
-    public ResponseEntity getAllSellItems(@RequestParam(value="Id", defaultValue="") int id) {
+    public ResponseEntity getAllSellItems(@RequestParam(value="itemId", defaultValue="") String itemId) {
         try {
-            return new ResponseEntity<>(sellItemService.findSellItems(id), HttpStatus.OK);
+            return new ResponseEntity<>(sellItemService.findAllSellItems(itemId), HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
@@ -43,7 +43,22 @@ public class SellItemController {
     }
 
     /**
-     * 물품 판매 등록
+     * 판매 상품 상세 조회
+     *
+     * @return ResponseEntity
+     */
+    @GetMapping("/detail")
+    public ResponseEntity getSellItem(@RequestParam(value="id", defaultValue="") String id) {
+        try {
+            return new ResponseEntity<>(sellItemService.findSellItem(id), HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("{}", e);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
+     * 상품 판매 등록
      *
      * @return ResponseEntity
      */
@@ -55,22 +70,7 @@ public class SellItemController {
             ObjectMapper objectMapper = new ObjectMapper();
             SellItem sellItem = objectMapper.readValue(sellItemReq.getSellItemString(), SellItem.class);
             return new ResponseEntity<>(sellItemService.saveItem(sellItem,
-                   imageFileList, sellItemReq.getRegiImageList()), HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("{}", e);
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
-        }
-    }
-
-    /**
-     * 물품 사진 S3 저장
-     *
-     * @return ResponseEntity
-     */
-    @PostMapping("/imageUrl")
-    public ResponseEntity saveImaegUrlS3(ImageUrl imageUrl, @RequestPart(value = "image", required = false) final MultipartFile image) {
-        try {
-            return new ResponseEntity<>(sellItemService.saveImageUrl(imageUrl), HttpStatus.OK);
+                   imageFileList), HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);

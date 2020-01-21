@@ -2,6 +2,7 @@ package kr.ant.booksharing.controller;
 
 import kr.ant.booksharing.dao.ItemMapper;
 import kr.ant.booksharing.domain.SellItem;
+import kr.ant.booksharing.model.BookApiBuyRes;
 import kr.ant.booksharing.model.Item.ItemRes;
 import kr.ant.booksharing.repository.SellItemRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 import static kr.ant.booksharing.model.DefaultRes.FAIL_DEFAULT_RES;
@@ -37,9 +39,36 @@ public class NaverBookApiController {
         this.sellItemRepository = sellItemRepository;
     }
 
-
-    @GetMapping("naver/bookApi")
+    @GetMapping("naver/bookApi/buy")
     public ResponseEntity getAllBooks(@RequestParam(value="keyword", defaultValue="") String keyword) {
+        try {
+            List<String> itemIdList = new ArrayList<>();
+            BookApiBuyRes bookApiBuyRes = new BookApiBuyRes();
+            if(sellItemRepository.findAllByTitleContaining(keyword).isPresent()){
+                List<SellItem> sellItemList =
+                        sellItemRepository.findAllByTitleContaining(keyword).get();
+                for(SellItem sellItem : sellItemList) {
+                    itemIdList.add(sellItem.getItemId());
+                }
+                System.out.println(sellItemList.toString());
+                String booksFromNaverBookApi = getAllBooksFromNaverBookApi(itemIdList, keyword);
+                bookApiBuyRes.setSellItemList(sellItemList);
+                bookApiBuyRes.setBooksFromNaverApi(booksFromNaverBookApi);
+                return new ResponseEntity<>(bookApiBuyRes, HttpStatus.OK);
+            }
+            else{
+                String booksFromNaverBookApi = getAllBooksFromNaverBookApi(itemIdList, keyword);
+                bookApiBuyRes.setSellItemList(new ArrayList<>());
+                bookApiBuyRes.setBooksFromNaverApi(booksFromNaverBookApi);
+                return new ResponseEntity<>(bookApiBuyRes, HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    public String getAllBooksFromNaverBookApi(final List<String> itemIdList, final String keyword) {
         try {
             String text = URLEncoder.encode(keyword, "UTF-8");
             String apiURL = "https://openapi.naver.com/v1/search/book.xml?query="+ text+"&display=30"; // json 결과
@@ -69,39 +98,29 @@ public class NaverBookApiController {
                 rss = jsonObject.getJSONObject("rss");
             }
             else{
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                return "";
             }
+
             JSONArray jsonArray =
                     rss.getJSONObject("channel").getJSONArray("item");
 
             for(int i = 0; i < jsonArray.length(); i++){
                 String isbnOfSearchedResult = jsonArray.getJSONObject(i)
                         .getString("isbn").split(" ")[1];
-                String lowestPrice = "";
-                int registeredCount = 0;
-                String itemId = "";
 
-                if(sellItemRepository.findAllByItemId(isbnOfSearchedResult).isPresent()){
-                    List<SellItem> sellItemList = sellItemRepository.findAllByItemId(isbnOfSearchedResult).get();
-                    int lowest = Integer.parseInt(sellItemList.get(0).getPrice());
-                    for(SellItem sellItem : sellItemList){
-                        int price = Integer.parseInt(sellItem.getPrice());
-                        if(price < lowest) lowest = price;
+                boolean isRegistered = false;
+                for(String itemId : itemIdList) {
+                    if(itemId.equals(isbnOfSearchedResult)){
+                        isRegistered = true;
+                        break;
                     }
-                    lowestPrice = String.valueOf(lowest);
-                    registeredCount = sellItemList.size();
-                    itemId = isbnOfSearchedResult;
                 }
-                jsonArray.getJSONObject(i).put("lowestPrice", lowestPrice);
-                jsonArray.getJSONObject(i).put("registeredCount", registeredCount);
-                jsonArray.getJSONObject(i).put("itemId", itemId);
+                jsonArray.getJSONObject(i).put("isRegistered", isRegistered);
             }
-
-
-            return new ResponseEntity<>(jsonObject.toString(), HttpStatus.OK);
+            return jsonObject.toString();
         } catch (Exception e) {
-            System.out.println(e);
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+            e.printStackTrace();
+            return null;
         }
     }
 

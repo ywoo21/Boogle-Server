@@ -9,8 +9,7 @@ import java.util.List;
 
 @Data
 public class SellItemReq {
-    private String sellItemString;
     private SellItem sellItem;
-    private List<RegiImage> regiImageList;
+    private String sellItemString;
     private List<MultipartFile> imageFileList;
 }
