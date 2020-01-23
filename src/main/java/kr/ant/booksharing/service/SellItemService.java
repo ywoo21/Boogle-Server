@@ -1,8 +1,10 @@
 package kr.ant.booksharing.service;
 
+import kr.ant.booksharing.domain.Item;
 import kr.ant.booksharing.domain.RegiImage;
 import kr.ant.booksharing.domain.SellItem;
 import kr.ant.booksharing.model.*;
+import kr.ant.booksharing.repository.ItemRepository;
 import kr.ant.booksharing.repository.RegiImageRepository;
 import kr.ant.booksharing.repository.SellItemRepository;
 import kr.ant.booksharing.utils.ResponseMessage;
@@ -21,13 +23,16 @@ public class SellItemService {
     private final SellItemRepository sellItemRepository;
     private final RegiImageRepository regiImageRepository;
     private final S3FileUploadService s3FileUploadService;
+    private final ItemRepository itemRepository;
 
     public SellItemService(final SellItemRepository sellItemRepository,
                            final S3FileUploadService s3FileUploadService,
-                           final RegiImageRepository regiImageRepository) {
+                           final RegiImageRepository regiImageRepository,
+                           final ItemRepository itemRepository) {
         this.sellItemRepository = sellItemRepository;
         this.s3FileUploadService = s3FileUploadService;
         this.regiImageRepository = regiImageRepository;
+        this.itemRepository = itemRepository;
     }
 
     /**
@@ -86,6 +91,24 @@ public class SellItemService {
             }
 
             sellItem.setRegiImageUrlList(regiImageUrlList);
+
+            Item item = new Item();
+            if(itemRepository.findByItemId(sellItem.getItemId()).isPresent()){
+
+                int currCont = itemRepository.findByItemId(sellItem.getItemId()).get().getRegiCount();
+
+                item.setItemId(sellItem.getItemId());
+                item.setTitle(sellItem.getTitle());
+                item.setRegiCount(currCont++);
+                itemRepository.save(item);
+
+            }
+            else{
+                item.setItemId(sellItem.getItemId());
+                item.setTitle(sellItem.getTitle());
+                item.setRegiCount(1);
+                itemRepository.save(item);
+            }
 
             sellItemRepository.save(sellItem);
 
