@@ -49,41 +49,56 @@ public class NaverBookApiController {
 
             if (itemRepository.findAllByTitleContaining(keyword).isPresent()) {
                 List<Item> itemList = itemRepository.findAllByTitleContaining(keyword).get();
-
-                List<SellItem> sellItemList = new ArrayList<>();
-
+                /*
                 for(Item item : itemList){
                     if(sellItemRepository.findAllByItemId(item.getItemId()).isPresent()){
                         sellItemList.addAll(sellItemRepository.findAllByItemId(item.getItemId()).get());
                     }
                 }
+                */
 
-                for (SellItem sellItem : sellItemList) {
+                for (Item item : itemList) {
                     ItemRes itemRes = new ItemRes();
+
+                    List<SellItem> sellItemList =
+                            sellItemRepository.findAllByItemId(item.getItemId()).get();
+
+                    SellItem sellItem = sellItemList.get(0);
+
                     itemIdList.add(sellItem.getItemId());
                     itemRes.setItemId(sellItem.getItemId());
                     itemRes.setPrice(sellItem.getPrice());
-                    itemRes.setRegiPrice(sellItem.getRegiPrice());
+
+                    int minRegiPrice =
+                            Integer.parseInt(sellItemList.get(0).getRegiPrice());
+                    for(SellItem temp : sellItemList){
+                        if(Integer.parseInt(temp.getPrice()) < minRegiPrice){
+                            minRegiPrice = Integer.parseInt(temp.getPrice());
+                        }
+                    }
+
+                    itemRes.setRegiPrice(String.valueOf(minRegiPrice));
+
                     itemRes.setTitle(sellItem.getTitle());
                     itemRes.setPubdate(sellItem.getPubdate());
                     itemRes.setPublisher(sellItem.getPublisher());
                     itemRes.setAuthor(sellItem.getAuthor());
                     itemRes.setImageUrl(sellItem.getImageUrl());
-                    itemRes.setRegiCount(itemRepository.findByItemId(sellItem.getItemId()).get().getRegiCount());
+                    itemRes.setRegiCount(item.getRegiCount());
                     itemResList.add(itemRes);
                 }
             }
-
+            if(getAllBooksFromNaverBookApi(itemIdList, keyword).equals("")){
+                return new ResponseEntity<>(itemResList, HttpStatus.OK);
+            }
             String booksFromNaverBookApi = getAllBooksFromNaverBookApi(itemIdList, keyword);
             JSONParser parser = new JSONParser();
 
             org.json.simple.JSONArray jsonArray = null;
 
             try {
-                if(parser.parse(booksFromNaverBookApi) == null) {
-                    return new ResponseEntity<>(itemResList, HttpStatus.OK);
-                }
                 Object obj = parser.parse(booksFromNaverBookApi);
+
                 obj = ((org.json.simple.JSONObject)obj).get("rss");
                 obj = ((org.json.simple.JSONObject)obj).get("channel");
                 obj = ((org.json.simple.JSONObject)obj).get("item");
@@ -91,7 +106,8 @@ public class NaverBookApiController {
                 for (int i = 0; i < jsonArray.size(); i++) {
                     ItemRes itemRes = new ItemRes();
                     org.json.simple.JSONObject jsonObject = (org.json.simple.JSONObject)jsonArray.get(i);
-                    itemRes.setItemId(jsonObject.get("isbn").toString().substring(11));
+                    if(jsonObject.get("isbn").toString().length() > 11)
+                        itemRes.setItemId(jsonObject.get("isbn").toString().substring(11));
                     itemRes.setTitle(jsonObject.get("title").toString()
                             .replace("<b>", "").replace("</b>", ""));
                     itemRes.setAuthor(jsonObject.get("author").toString()
@@ -184,7 +200,7 @@ public class NaverBookApiController {
             JSONObject jsonObject = XML.toJSONObject(response.toString());
 
             JSONObject rss;
-            if (jsonObject.getJSONObject("rss") != null) {
+            if (!jsonObject.isNull("rss")) {
                 rss = jsonObject.getJSONObject("rss");
             } else {
                 return "";
