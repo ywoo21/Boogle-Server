@@ -46,9 +46,10 @@ public class SellItemController {
      * @return ResponseEntity
      */
     @GetMapping("/detail")
-    public ResponseEntity getSellItem(@RequestParam(value="id", defaultValue="") String id) {
+    public ResponseEntity getSellItem(@RequestParam(value="id", defaultValue="") String id,
+                                      @RequestHeader("Authorization") String token) {
         try {
-            return new ResponseEntity<>(sellItemService.findSellItem(id), HttpStatus.OK);
+            return new ResponseEntity<>(sellItemService.findSellItem(token, id), HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
@@ -56,7 +57,7 @@ public class SellItemController {
     }
 
     /**
-     * 상품 판매 등록
+     * 판매 상품 등록
      *
      * @return ResponseEntity
      */
@@ -76,7 +77,7 @@ public class SellItemController {
     }
 
     /**
-     * 상품 판매 등록
+     * 테스트
      *
      * @return ResponseEntity
      */

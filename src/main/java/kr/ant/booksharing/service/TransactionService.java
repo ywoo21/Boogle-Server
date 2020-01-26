@@ -1,7 +1,10 @@
 package kr.ant.booksharing.service;
 
+import kr.ant.booksharing.domain.SellItem;
 import kr.ant.booksharing.domain.Transaction;
 import kr.ant.booksharing.model.DefaultRes;
+import kr.ant.booksharing.model.SellItemRes;
+import kr.ant.booksharing.repository.SellItemRepository;
 import kr.ant.booksharing.repository.TransactionRepository;
 import kr.ant.booksharing.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
@@ -12,9 +15,12 @@ import org.springframework.stereotype.Service;
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
+    private final SellItemRepository sellItemRepository;
 
-    public TransactionService(final TransactionRepository transactionRepository) {
+    public TransactionService(final TransactionRepository transactionRepository,
+                              final SellItemRepository sellItemRepository) {
         this.transactionRepository = transactionRepository;
+        this.sellItemRepository = sellItemRepository;
     }
 
     /**
@@ -25,6 +31,11 @@ public class TransactionService {
      */
     public DefaultRes<Transaction> saveTransaction(final Transaction transaction) {
         try{
+
+            SellItem sellItem = sellItemRepository.findBy_id(transaction.getSellItemId()).get();
+
+            sellItem.setTraded(true);
+            sellItemRepository.save(sellItem);
 
             transactionRepository.save(transaction);
 

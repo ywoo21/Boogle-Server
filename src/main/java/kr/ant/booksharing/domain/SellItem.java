@@ -32,4 +32,5 @@ public class SellItem {
     private int sellerId;
     private Date regiTime;
     private String comment;
+    private boolean isTraded;
 }

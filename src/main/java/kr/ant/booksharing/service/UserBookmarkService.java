@@ -27,7 +27,13 @@ public class UserBookmarkService {
             UserBookmark userBookmark = new UserBookmark();
             userBookmark.setUserId(userId);
             userBookmark.setSellItemId(sellItemId);
-            userBookmarkRepository.save(userBookmark);
+
+            if(userBookmarkRepository.findByUserIdAndSellItemId(userId, sellItemId).isPresent()){
+                userBookmarkRepository.deleteByUserIdAndSellItemId(userId, sellItemId);
+            }
+            else{
+                userBookmarkRepository.save(userBookmark);
+            }
 
             return DefaultRes.res(StatusCode.CREATED, "찜하기 저장 성공");
 

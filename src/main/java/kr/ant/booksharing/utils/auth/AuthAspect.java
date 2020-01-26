@@ -39,9 +39,10 @@ public class AuthAspect {
     @Around("@annotation(kr.ant.booksharing.utils.auth.Auth)")
     public Object around(final ProceedingJoinPoint pjp) throws Throwable {
         final String jwt = httpServletRequest.getHeader(AUTHORIZATION);
-
+        int userIdx;
+        if(jwt.equals("")) userIdx = -1;
         //if (jwt == null) return UNAUTHORIZED_RES;
-        int userIdx = userService.authorization(jwt);
+        userIdx = userService.authorization(jwt);
         if (userIdx == -1) return UNAUTHORIZED_RES;
          
         httpServletRequest.setAttribute("userIdx", userIdx);

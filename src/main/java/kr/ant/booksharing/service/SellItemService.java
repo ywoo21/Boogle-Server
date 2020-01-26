@@ -3,7 +3,6 @@ package kr.ant.booksharing.service;
 import kr.ant.booksharing.domain.Item;
 import kr.ant.booksharing.domain.SellItem;
 import kr.ant.booksharing.domain.User;
-import kr.ant.booksharing.domain.UserBookmark;
 import kr.ant.booksharing.model.*;
 import kr.ant.booksharing.repository.*;
 import kr.ant.booksharing.utils.ResponseMessage;
@@ -26,19 +25,22 @@ public class SellItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final UserBookmarkRepository userBookmarkRepository;
+    private final UserService userService;
 
     public SellItemService(final SellItemRepository sellItemRepository,
                            final S3FileUploadService s3FileUploadService,
                            final RegiImageRepository regiImageRepository,
                            final ItemRepository itemRepository,
                            final UserRepository userRepository,
-                           final UserBookmarkRepository userBookmarkRepository) {
+                           final UserBookmarkRepository userBookmarkRepository,
+                           final UserService userService) {
         this.sellItemRepository = sellItemRepository;
         this.s3FileUploadService = s3FileUploadService;
         this.regiImageRepository = regiImageRepository;
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
         this.userBookmarkRepository = userBookmarkRepository;
+        this.userService = userService;
     }
 
     /**
@@ -53,11 +55,11 @@ public class SellItemService {
 
             List<SellItem> sellItemList = sellItemRepository.findAllByItemId(itemId).get();
 
-            return DefaultRes.res(StatusCode.OK, ResponseMessage.READ_SELL_ITEM, sellItemList);
+            return DefaultRes.res(StatusCode.OK, "판매 상품 조회 성공", sellItemList);
 
         }
         else{
-            return DefaultRes.res(StatusCode.NOT_FOUND, ResponseMessage.NOT_FOUND_SELL_ITEM);
+            return DefaultRes.res(StatusCode.NOT_FOUND, "판매 상품 조회 실패");
         }
     }
 
@@ -67,7 +69,7 @@ public class SellItemService {
      * @param
      * @return DefaultRes
      */
-    public DefaultRes<SellItemRes> findSellItem(final String id) {
+    public DefaultRes<SellItemRes> findSellItem(final String token, final String id) {
 
         if(sellItemRepository.findBy_id(id).isPresent()){
 
@@ -77,7 +79,12 @@ public class SellItemService {
             User sellerUser = userRepository.findById(sellItem.getSellerId()).get();
             sellerUser.setPassword("");
             sellItemRes.setSellerUser(userRepository.findById(sellItem.getSellerId()).get());
-            sellItemRes.setBookmarked(userBookmarkRepository.findAllByUserId(sellItem.getSellerId()).get());
+
+            if(userBookmarkRepository.findByUserIdAndSellItemId
+                    (userService.authorization(token), sellItem.get_id()).isPresent()){
+                sellItemRes.setBookmarked(true);
+            }
+            else { sellItemRes.setBookmarked(false); }
 
             return DefaultRes.res(StatusCode.OK, "판매 상품 상세 조회 성공", sellItemRes);
 
@@ -88,7 +95,7 @@ public class SellItemService {
     }
 
     /**
-     * 물품 정보 등록
+     * 판매 상품 등록
      *
      * @param
      * @return DefaultRes

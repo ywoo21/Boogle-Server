@@ -92,7 +92,7 @@ public class UserService {
     public DefaultRes checkEmail(final String email) {
         try {
             if(userRepository.findByEmail(email).isPresent()){
-                return DefaultRes.res(StatusCode.OK, "중복 이메일");
+                return DefaultRes.res(StatusCode.OK, "중복된 이메일");
             }
             else{
                 return DefaultRes.res(StatusCode.NOT_FOUND, "사용 가능한 이메일");
@@ -112,7 +112,7 @@ public class UserService {
     public DefaultRes checkNickname(final String nickname) {
         try {
             if(userRepository.findByNickname(nickname).isPresent()){
-                return DefaultRes.res(StatusCode.OK, "중복 닉네임");
+                return DefaultRes.res(StatusCode.OK, "중복된 닉네임");
             }
             else{
                 return DefaultRes.res(StatusCode.NOT_FOUND, "사용 가능한 닉네임");
