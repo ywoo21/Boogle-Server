@@ -1,12 +1,11 @@
 package kr.ant.booksharing.service;
 
 import kr.ant.booksharing.domain.Item;
-import kr.ant.booksharing.domain.RegiImage;
 import kr.ant.booksharing.domain.SellItem;
+import kr.ant.booksharing.domain.User;
+import kr.ant.booksharing.domain.UserBookmark;
 import kr.ant.booksharing.model.*;
-import kr.ant.booksharing.repository.ItemRepository;
-import kr.ant.booksharing.repository.RegiImageRepository;
-import kr.ant.booksharing.repository.SellItemRepository;
+import kr.ant.booksharing.repository.*;
 import kr.ant.booksharing.utils.ResponseMessage;
 import kr.ant.booksharing.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
@@ -25,15 +24,21 @@ public class SellItemService {
     private final RegiImageRepository regiImageRepository;
     private final S3FileUploadService s3FileUploadService;
     private final ItemRepository itemRepository;
+    private final UserRepository userRepository;
+    private final UserBookmarkRepository userBookmarkRepository;
 
     public SellItemService(final SellItemRepository sellItemRepository,
                            final S3FileUploadService s3FileUploadService,
                            final RegiImageRepository regiImageRepository,
-                           final ItemRepository itemRepository) {
+                           final ItemRepository itemRepository,
+                           final UserRepository userRepository,
+                           final UserBookmarkRepository userBookmarkRepository) {
         this.sellItemRepository = sellItemRepository;
         this.s3FileUploadService = s3FileUploadService;
         this.regiImageRepository = regiImageRepository;
         this.itemRepository = itemRepository;
+        this.userRepository = userRepository;
+        this.userBookmarkRepository = userBookmarkRepository;
     }
 
     /**
@@ -62,13 +67,19 @@ public class SellItemService {
      * @param
      * @return DefaultRes
      */
-    public DefaultRes<SellItem> findSellItem(final String id) {
+    public DefaultRes<SellItemRes> findSellItem(final String id) {
 
         if(sellItemRepository.findBy_id(id).isPresent()){
 
+            SellItemRes sellItemRes = new SellItemRes();
             SellItem sellItem = sellItemRepository.findBy_id(id).get();
+            sellItemRes.setSellItem(sellItem);
+            User sellerUser = userRepository.findById(sellItem.getSellerId()).get();
+            sellerUser.setPassword("");
+            sellItemRes.setSellerUser(userRepository.findById(sellItem.getSellerId()).get());
+            sellItemRes.setBookmarked(userBookmarkRepository.findAllByUserId(sellItem.getSellerId()).get());
 
-            return DefaultRes.res(StatusCode.OK, "판매 상품 상세 조회 성공", sellItem);
+            return DefaultRes.res(StatusCode.OK, "판매 상품 상세 조회 성공", sellItemRes);
 
         }
         else{
@@ -139,6 +150,7 @@ public class SellItemService {
     @Transactional
     public DefaultRes<String> saveImageInS3(final ImageFileReq imageFileReq) {
         try{
+
             String imageUrl = s3FileUploadService.upload(imageFileReq.getImageFile());
             return DefaultRes.res(StatusCode.CREATED, "물품 정보 등록 성공", imageUrl);
 

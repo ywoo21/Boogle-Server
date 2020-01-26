@@ -1,11 +1,8 @@
 package kr.ant.booksharing.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.ant.booksharing.domain.RegiImage;
 import kr.ant.booksharing.domain.SellItem;
 import kr.ant.booksharing.model.ImageFileReq;
-import kr.ant.booksharing.model.ImageUrl;
-import kr.ant.booksharing.model.RegiImageReq;
 import kr.ant.booksharing.model.SellItemReq;
 import kr.ant.booksharing.service.SellItemService;
 import lombok.extern.slf4j.Slf4j;
