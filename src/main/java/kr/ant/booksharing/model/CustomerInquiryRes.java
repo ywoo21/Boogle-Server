@@ -8,4 +8,9 @@ import lombok.Data;
 public class CustomerInquiryRes {
     private CustomerInquiry customerInquiry;
     private User user;
+
+    public CustomerInquiryRes(CustomerInquiry customerInquiry, User user){
+        this.customerInquiry = customerInquiry;
+        this.user = user;
+    }
 }

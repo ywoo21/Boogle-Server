@@ -17,4 +17,5 @@ public class CustomerInquiry {
     private String email;
     private Integer type;
     private String msg;
+    private Boolean isMember;
 }

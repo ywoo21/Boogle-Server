@@ -1,20 +1,30 @@
 package kr.ant.booksharing.service;
 
 import kr.ant.booksharing.domain.CustomerInquiry;
+import kr.ant.booksharing.domain.User;
+import kr.ant.booksharing.model.CustomerInquiryRes;
 import kr.ant.booksharing.model.DefaultRes;
 import kr.ant.booksharing.repository.CustomerInquiryRepository;
+import kr.ant.booksharing.repository.UserRepository;
 import kr.ant.booksharing.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @Slf4j
 @Service
 public class CustomerInquiryService {
     private final CustomerInquiryRepository customerInquiryRepository;
+    private final UserRepository userRepository;
 
-    public CustomerInquiryService(final CustomerInquiryRepository customerInquiryRepository){this.customerInquiryRepository = customerInquiryRepository;}
+    public CustomerInquiryService(final CustomerInquiryRepository customerInquiryRepository,
+                                  final UserRepository userRepository){
+        this.customerInquiryRepository = customerInquiryRepository;
+        this.userRepository = userRepository;
+    }
 
     /**
      * 고객의 소리 조회
@@ -22,9 +32,25 @@ public class CustomerInquiryService {
      * @param
      * @return DefaultRes
      */
-    public DefaultRes<List<CustomerInquiry>> findAllCustomerInquiries() {
+    public DefaultRes<List<CustomerInquiryRes>> findAllCustomerInquiries() {
+        List<CustomerInquiry> customerInquiryList = customerInquiryRepository.findAll();
+        Iterator<CustomerInquiry> iter = customerInquiryList.iterator();
+        List<CustomerInquiryRes> customerInquiryResList = new ArrayList<>();
+        try {
+            while (iter.hasNext()) {
+                CustomerInquiry temp = iter.next();
+                if (temp.getIsMember() != null && temp.getIsMember()) {
+                    User user = userRepository.findByEmail(temp.getEmail()).get();
+                    user.setPassword(null);
+                    customerInquiryResList.add(new CustomerInquiryRes(temp, user));
+                } else customerInquiryResList.add(new CustomerInquiryRes(temp, null));
+            }
+        } catch(Exception e){
+            System.out.println(e);
+            return DefaultRes.res(StatusCode.NOT_FOUND, "고객의 소리 조회 실패");
+        }
 
-        return DefaultRes.res(StatusCode.OK, "고객의 소리 조회 성공", customerInquiryRepository.findAll());
+        return DefaultRes.res(StatusCode.OK, "고객의 소리 조회 성공", customerInquiryResList);
     }
 
     /**
@@ -33,8 +59,17 @@ public class CustomerInquiryService {
      * @param customerInquiry 고객의 소리
      * @return DefaultRes
      */
-    public DefaultRes saveCustomerInquiry(final CustomerInquiry customerInquiry) {
+    public DefaultRes saveCustomerInquiry(final int userId, CustomerInquiry customerInquiry) {
         try {
+            // 비회원일 떄
+            if(userId == -1) {
+                customerInquiry.setIsMember(false);
+            }
+            // 회원일 때
+            else {
+                customerInquiry.setIsMember(true);
+                customerInquiry.setEmail(userRepository.findById(userId).get().getEmail());
+            }
             customerInquiryRepository.save(customerInquiry);
             return DefaultRes.res(StatusCode.CREATED, "고객의 소리 저장 성공");
         } catch (Exception e) {
