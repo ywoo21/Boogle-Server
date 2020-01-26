@@ -8,5 +8,5 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserBookmarkRepository extends MongoRepository<UserBookmark, String> {
-    Optional<List<UserBookmark>> findAllByUserId(int userId);
+    Optional<UserBookmark> findAllByUserIdAndSellItemId(final int userId, final String sellItemId);
 }
