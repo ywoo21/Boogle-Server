@@ -13,6 +13,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.Random;
 
 
@@ -206,5 +207,17 @@ public class UserService {
         Random random = new Random();
 
         return String.valueOf(random.nextInt(9000) + 1000);
+    }
+
+    public int authorization(final String jwt) {
+
+        final int userIdx = jwtService.decode(jwt).getUser_idx();
+        if (userIdx == -1) return -1;
+
+        final Optional<User > user = userRepository.findById(userIdx);
+        if (!user.isPresent()) return -1;
+
+        return userIdx;
+
     }
 }
