@@ -44,7 +44,7 @@ public class AuthAspect {
         //if (jwt == null) return UNAUTHORIZED_RES;
         userIdx = userService.authorization(jwt);
         if (userIdx == -1) return UNAUTHORIZED_RES;
-         
+
         httpServletRequest.setAttribute("userIdx", userIdx);
 
         return pjp.proceed(pjp.getArgs());
