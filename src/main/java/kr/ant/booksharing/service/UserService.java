@@ -1,48 +1,59 @@
 package kr.ant.booksharing.service;
 
 import kr.ant.booksharing.dao.UserMapper;
+import kr.ant.booksharing.domain.User;
 import kr.ant.booksharing.model.DefaultRes;
-import kr.ant.booksharing.model.SignIn.SignInRes;
 import kr.ant.booksharing.model.SignIn.SignInReq;
-import kr.ant.booksharing.model.SignUp.SignUpReq;
+import kr.ant.booksharing.repository.UserRepository;
 import kr.ant.booksharing.utils.ResponseMessage;
 import kr.ant.booksharing.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Random;
+
 
 @Slf4j
 @Service
 public class UserService {
 
     private final UserMapper userMapper;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final JavaMailSender javaMailSender;
+
 
     public UserService(final UserMapper userMapper, final PasswordEncoder passwordEncoder,
-                       final JwtService jwtService) {
+                       final UserRepository userRepository, final JwtService jwtService,
+                       final JavaMailSender javaMailSender) {
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
+        this.userRepository = userRepository;
         this.jwtService = jwtService;
-
+        this.javaMailSender = javaMailSender;
     }
 
 
     /**
      * 회원 정보 저장
      *
-     * @param signUpReq 회원 가입 데이터
+     * @param user 회원
      * @return DefaultRes
      */
-    public DefaultRes saveUser(final SignUpReq signUpReq) {
+    public DefaultRes saveUser(final User user) {
         try {
-            String encodedPassword = passwordEncoder.encode(signUpReq.getPassword());
-            signUpReq.setPassword(encodedPassword);
-            userMapper.saveUser(signUpReq);
-            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CREATED_USER);
+            String encodedPassword = passwordEncoder.encode(user.getPassword());
+            user.setPassword(encodedPassword);
+            System.out.println(user.toString());
+            userRepository.save(user);
+            return DefaultRes.res(StatusCode.CREATED, "회원 정보 저장 성공");
         } catch (Exception e) {
             System.out.println(e);
-            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.FAIL_CREATE_USER);
+            return DefaultRes.res(StatusCode.DB_ERROR, "회원 정보 저장 실패");
         }
     }
 
@@ -54,23 +65,18 @@ public class UserService {
      */
     public DefaultRes authUser(final SignInReq signInReq) {
         try {
-            if(userMapper.findUser(signInReq) != null){
-                SignInRes signInRes = userMapper.findUser(signInReq);
-                if(passwordEncoder.matches(signInReq.getPassword(), signInRes.getPassword())){
+            if(userRepository.findByEmail(signInReq.getEmail()).isPresent()){
+                User user = userRepository.findByEmail(signInReq.getEmail()).get();
+                if(passwordEncoder.matches(signInReq.getPassword(), user.getPassword())){
                     final JwtService.TokenRes tokenRes =
-                            new JwtService.TokenRes(jwtService.create(signInRes.getId()));
-
-                    signInRes.setTokenRes(tokenRes); signInRes.setPassword("");
-
-                    return DefaultRes.res(StatusCode.CREATED, ResponseMessage.LOGIN_SUCCESS,signInRes);
+                            new JwtService.TokenRes(jwtService.create(user.getId()));
+                    return DefaultRes.res(StatusCode.OK, "로그인 성공",tokenRes.getToken());
                 }
-                else { return DefaultRes.res(StatusCode.FORBIDDEN, ResponseMessage.LOGIN_FAIL); }
+                else { return DefaultRes.res(StatusCode.NOT_FOUND, "로그인 실패 ");}
             }
             else{
-                return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
+                return DefaultRes.res(StatusCode.NOT_FOUND, "로그인 실패 ");
             }
-
-
         } catch (Exception e) {
             System.out.println(e);
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
@@ -84,15 +90,96 @@ public class UserService {
      */
     public DefaultRes checkEmail(final String email) {
         try {
-            if(userMapper.checkEmail(email) != null && !(userMapper.checkEmail(email).equals(""))){
-                return DefaultRes.res(StatusCode.NO_CONTENT, ResponseMessage.ALREADY_USER);
+            if(userRepository.findByEmail(email).isPresent()){
+                return DefaultRes.res(StatusCode.OK, "중복 이메일");
             }
             else{
-                return DefaultRes.res(StatusCode.OK, ResponseMessage.USABLE_USER);
+                return DefaultRes.res(StatusCode.NOT_FOUND, "사용 가능한 이메일");
             }
         } catch (Exception e) {
             System.out.println(e);
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
+        }
+    }
+
+    /**
+     * 닉네임 중복 검사
+     *
+     * @param nickname 회원 닉네임
+     * @return DefaultRes
+     */
+    public DefaultRes checkNickname(final String nickname) {
+        try {
+            if(userRepository.findByNickname(nickname).isPresent()){
+                return DefaultRes.res(StatusCode.OK, "중복 닉네임");
+            }
+            else{
+                return DefaultRes.res(StatusCode.NOT_FOUND, "사용 가능한 닉네임");
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
+        }
+    }
+
+    /**
+     * 인증 이메일 전송
+     *
+     * @return DefaultRes
+     */
+    public DefaultRes sendAuthEmail(final String email, final String campusEmail) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom("boogleforus@gmail.com");
+            message.setTo(campusEmail);
+            message.setSubject("북을 이메일 인증");
+            String code = Integer.toString(Math.abs(email.hashCode())).substring(0,4);
+            if(code.length() < 4){
+                String zeroString = "0";
+                for(int i = 0; i <  4 - code.length(); i++){
+                    zeroString += "0";
+                }
+                code = zeroString + code;
+            }
+            message.setText("인증 코드 : " + code);
+            javaMailSender.send(message);
+            return DefaultRes.res(StatusCode.OK, "메일 전송 성공");
+        }
+        catch(Exception e){
+            System.out.println(e);
+            return DefaultRes.res(StatusCode.BAD_REQUEST, "메일 전송 실패");
+        }
+    }
+
+    /**
+     * 이메일 인증
+     *
+     * @return DefaultRes
+     */
+    public DefaultRes emailAuth(final String email, final String authCode) {
+        try {
+            if(authCode.substring(0,1).equals("0") || authCode.substring(0,2).equals("00")
+            || authCode.substring(0,3).equals("000") || authCode.equals("0000")){
+                authCode.replace("0", "");
+            }
+
+            String code = Integer.toString(Math.abs(email.hashCode())).substring(0,4);
+            if(code.length() < 4){
+                String zeroString = "0";
+                for(int i = 0; i <  4 - code.length(); i++){
+                    zeroString += "0";
+                }
+                code = zeroString + code;
+            }
+
+            if(authCode.equals(code))
+                return DefaultRes.res(StatusCode.OK, "이메일 인증 성공", true);
+            else return DefaultRes.res(StatusCode.OK, "이메일 인증 실패", false);
+
+        }
+        catch(Exception e){
+            System.out.println(e);
+            return DefaultRes.res(StatusCode.BAD_REQUEST, "이메일 인증 실패");
         }
     }
 
@@ -110,5 +197,14 @@ public class UserService {
             System.out.println(e);
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
         }
+    }
+
+    /**
+     * @return 인증을 위해 사용자에게 전달 될 네 자리의 인증 번호
+     */
+    private String getAuthenticationNumber() {
+        Random random = new Random();
+
+        return String.valueOf(random.nextInt(9000) + 1000);
     }
 }

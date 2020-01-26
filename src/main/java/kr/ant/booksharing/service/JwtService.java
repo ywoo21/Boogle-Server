@@ -51,6 +51,30 @@ public class JwtService {
         return null;
     }
 
+    /**
+     * 토큰 생성
+     *
+     * @param email 토큰에 담길 로그인한 사용자의 회원 이메일
+     * @return 토큰
+     */
+    public String create(final String email) {
+        try {
+            //토큰 생성 빌더 객체 생성
+            JWTCreator.Builder b = JWT.create();
+            //토큰 생성자 명시
+            b.withIssuer(ISSUER);
+            //토큰 payload 작성, key - value 형식, 객체도 가능
+            b.withClaim("email", email);
+            //만료 날자 지정, 1달
+            b.withExpiresAt(expiresAt());
+            //토큰 해싱해서 반환
+            return b.sign(Algorithm.HMAC256(SECRET));
+        } catch (JWTCreationException JwtCreationException) {
+            log.info(JwtCreationException.getMessage());
+        }
+        return null;
+    }
+
     private Date expiresAt() {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date());
