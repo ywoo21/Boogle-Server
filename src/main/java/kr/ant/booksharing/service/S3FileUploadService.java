@@ -42,8 +42,10 @@ public class S3FileUploadService {
             final String saveFileName = getUuid() + ext;
             //파일 객체 생성
             File file = new File(System.getProperty("user.dir") + saveFileName);
+
             //파일 변환
             uploadFile.transferTo(file);
+
             //S3 파일 업로드
             uploadOnS3(saveFileName, file);
             //주소 할당

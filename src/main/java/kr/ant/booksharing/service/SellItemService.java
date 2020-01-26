@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,6 +82,7 @@ public class SellItemService {
      * @param
      * @return DefaultRes
      */
+    @Transactional
     public DefaultRes<List<SellItem>> saveItem(final SellItem sellItem,
                                                final List<MultipartFile> imageFileList) {
         try{
@@ -95,11 +97,14 @@ public class SellItemService {
             Item item = new Item();
             if(itemRepository.findByItemId(sellItem.getItemId()).isPresent()){
 
-                int currCont = itemRepository.findByItemId(sellItem.getItemId()).get().getRegiCount();
+                Item currItem =
+                        itemRepository.findByItemId(sellItem.getItemId()).get();
 
-                item.setItemId(sellItem.getItemId());
-                item.setTitle(sellItem.getTitle());
-                item.setRegiCount(currCont++);
+                item.set_id(currItem.get_id());
+                item.setItemId(currItem.getItemId());
+                item.setTitle(currItem.getTitle());
+                item.setRegiCount(currItem.getRegiCount() + 1);
+
                 itemRepository.save(item);
 
             }
@@ -117,7 +122,31 @@ public class SellItemService {
         }
         catch(Exception e){
 
-            log.info(e.getMessage());
+            e.printStackTrace();
+            System.out.println(e);
+
+            return DefaultRes.res(StatusCode.DB_ERROR, "물품 정보 등록 실패");
+
+        }
+    }
+
+    /**
+     * 물품 정보 등록
+     *
+     * @param
+     * @return DefaultRes
+     */
+    @Transactional
+    public DefaultRes<String> saveImageInS3(final ImageFileReq imageFileReq) {
+        try{
+            String imageUrl = s3FileUploadService.upload(imageFileReq.getImageFile());
+            return DefaultRes.res(StatusCode.CREATED, "물품 정보 등록 성공", imageUrl);
+
+        }
+        catch(Exception e){
+
+            System.out.println(e);
+
             return DefaultRes.res(StatusCode.DB_ERROR, "물품 정보 등록 실패");
 
         }

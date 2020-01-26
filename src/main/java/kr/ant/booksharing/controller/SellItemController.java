@@ -3,6 +3,7 @@ package kr.ant.booksharing.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.ant.booksharing.domain.RegiImage;
 import kr.ant.booksharing.domain.SellItem;
+import kr.ant.booksharing.model.ImageFileReq;
 import kr.ant.booksharing.model.ImageUrl;
 import kr.ant.booksharing.model.RegiImageReq;
 import kr.ant.booksharing.model.SellItemReq;
@@ -71,6 +72,21 @@ public class SellItemController {
             SellItem sellItem = objectMapper.readValue(sellItemReq.getSellItemString(), SellItem.class);
             return new ResponseEntity<>(sellItemService.saveItem(sellItem,
                    imageFileList), HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("{}", e);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
+     * 상품 판매 등록
+     *
+     * @return ResponseEntity
+     */
+    @PostMapping("test")
+    public ResponseEntity saveItem(final ImageFileReq imageFileReq) {
+        try {
+            return new ResponseEntity<>(sellItemService.saveImageInS3(imageFileReq), HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);

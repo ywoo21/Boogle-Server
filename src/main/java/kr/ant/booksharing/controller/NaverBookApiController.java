@@ -49,13 +49,6 @@ public class NaverBookApiController {
 
             if (itemRepository.findAllByTitleContaining(keyword).isPresent()) {
                 List<Item> itemList = itemRepository.findAllByTitleContaining(keyword).get();
-                /*
-                for(Item item : itemList){
-                    if(sellItemRepository.findAllByItemId(item.getItemId()).isPresent()){
-                        sellItemList.addAll(sellItemRepository.findAllByItemId(item.getItemId()).get());
-                    }
-                }
-                */
 
                 for (Item item : itemList) {
                     ItemRes itemRes = new ItemRes();
@@ -71,9 +64,10 @@ public class NaverBookApiController {
 
                     int minRegiPrice =
                             Integer.parseInt(sellItemList.get(0).getRegiPrice());
+
                     for(SellItem temp : sellItemList){
-                        if(Integer.parseInt(temp.getPrice()) < minRegiPrice){
-                            minRegiPrice = Integer.parseInt(temp.getPrice());
+                        if(Integer.parseInt(temp.getRegiPrice()) < minRegiPrice){
+                            minRegiPrice = Integer.parseInt(temp.getRegiPrice());
                         }
                     }
 
