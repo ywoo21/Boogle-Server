@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.util.Date;
 
 @Data
 @Document("customer_inquiry")
@@ -18,4 +19,6 @@ public class CustomerInquiry {
     private Integer type;
     private String msg;
     private Boolean isMember;
+    private Boolean status;
+    private Date date;
 }

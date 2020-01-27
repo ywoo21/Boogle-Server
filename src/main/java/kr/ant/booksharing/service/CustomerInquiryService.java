@@ -10,9 +10,7 @@ import kr.ant.booksharing.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -54,6 +52,60 @@ public class CustomerInquiryService {
     }
 
     /**
+     * 처리된 고객의 소리 조회
+     *
+     * @param
+     * @return DefaultRes
+     */
+    public DefaultRes<List<CustomerInquiryRes>> findAllDoneCustomerInquiries() {
+        List<CustomerInquiry> customerInquiryList = customerInquiryRepository.findAllByStatusIsTrue().get();
+        Iterator<CustomerInquiry> iter = customerInquiryList.iterator();
+        List<CustomerInquiryRes> customerInquiryResList = new ArrayList<>();
+        try {
+            while (iter.hasNext()) {
+                CustomerInquiry temp = iter.next();
+                if (temp.getIsMember() != null && temp.getIsMember()) {
+                    User user = userRepository.findByEmail(temp.getEmail()).get();
+                    user.setPassword(null);
+                    customerInquiryResList.add(new CustomerInquiryRes(temp, user));
+                } else customerInquiryResList.add(new CustomerInquiryRes(temp, null));
+            }
+        } catch(Exception e){
+            System.out.println(e);
+            return DefaultRes.res(StatusCode.NOT_FOUND, "처리된 고객의 소리 조회 실패");
+        }
+
+        return DefaultRes.res(StatusCode.OK, "처리된 고객의 소리 조회 성공", customerInquiryResList);
+    }
+
+    /**
+     * 처리 안 된 고객의 소리 조회
+     *
+     * @param
+     * @return DefaultRes
+     */
+    public DefaultRes<List<CustomerInquiryRes>> findAllUnDoneCustomerInquiries() {
+        List<CustomerInquiry> customerInquiryList = customerInquiryRepository.findAllByStatusIsFalse().get();
+        Iterator<CustomerInquiry> iter = customerInquiryList.iterator();
+        List<CustomerInquiryRes> customerInquiryResList = new ArrayList<>();
+        try {
+            while (iter.hasNext()) {
+                CustomerInquiry temp = iter.next();
+                if (temp.getIsMember() != null && temp.getIsMember()) {
+                    User user = userRepository.findByEmail(temp.getEmail()).get();
+                    user.setPassword(null);
+                    customerInquiryResList.add(new CustomerInquiryRes(temp, user));
+                } else customerInquiryResList.add(new CustomerInquiryRes(temp, null));
+            }
+        } catch(Exception e){
+            System.out.println(e);
+            return DefaultRes.res(StatusCode.NOT_FOUND, "처리 안 된 고객의 소리 조회 실패");
+        }
+
+        return DefaultRes.res(StatusCode.OK, "처리 안 된 고객의 소리 조회 성공", customerInquiryResList);
+    }
+
+    /**
      * 고객의 소리 저장
      *
      * @param customerInquiry 고객의 소리
@@ -70,6 +122,8 @@ public class CustomerInquiryService {
                 customerInquiry.setIsMember(true);
                 customerInquiry.setEmail(userRepository.findById(userId).get().getEmail());
             }
+            customerInquiry.setStatus(false);
+            customerInquiry.setDate(new Date());
             customerInquiryRepository.save(customerInquiry);
             return DefaultRes.res(StatusCode.CREATED, "고객의 소리 저장 성공");
         } catch (Exception e) {
@@ -77,4 +131,24 @@ public class CustomerInquiryService {
             return DefaultRes.res(StatusCode.DB_ERROR, "고객의 소리 저장 실패");
         }
     }
+
+    /**
+     * 고객의 소리 처리 여부 변경
+     *
+     * @param customerInquiryId 고객의 소리
+     * @return DefaultRes
+     */
+    public DefaultRes changeStatus(String customerInquiryId){
+        try{
+            CustomerInquiry customerInquiry = customerInquiryRepository.findById(customerInquiryId).get();
+            if(customerInquiry.getStatus() == null) customerInquiry.setStatus(true);
+            else customerInquiry.setStatus(!customerInquiry.getStatus());
+            customerInquiryRepository.save(customerInquiry);
+            return DefaultRes.res(StatusCode.OK, "고객의 소리 처리 여부 변경 성공");
+        } catch (Exception e){
+            System.out.println(e);
+            return DefaultRes.res(StatusCode.FAILED, "고객의 소리 처리 여부 변경 실패");
+        }
+    }
+
 }
