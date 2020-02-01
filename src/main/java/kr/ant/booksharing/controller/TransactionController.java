@@ -3,6 +3,7 @@ package kr.ant.booksharing.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.ant.booksharing.domain.SellItem;
 import kr.ant.booksharing.domain.Transaction;
+import kr.ant.booksharing.model.BoogleBoxReq;
 import kr.ant.booksharing.model.SellItemReq;
 import kr.ant.booksharing.service.TransactionService;
 import kr.ant.booksharing.utils.auth.Auth;
@@ -41,6 +42,21 @@ public class TransactionController {
             final int userIdx = (int) httpServletRequest.getAttribute("userIdx");
             transaction.setBuyerId(userIdx);
             return new ResponseEntity<>(transactionService.saveTransaction(transaction), HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("{}", e);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
+     * 거래 정보 목록 열람
+     *
+     * @return ResponseEntity
+     */
+    @GetMapping("/admin")
+    public ResponseEntity getAllTransaction(){
+        try {
+            return new ResponseEntity<>(transactionService.findAllTransaction(), HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
