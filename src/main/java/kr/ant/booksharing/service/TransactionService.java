@@ -10,6 +10,8 @@ import kr.ant.booksharing.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class TransactionService {
@@ -43,9 +45,25 @@ public class TransactionService {
 
         }
         catch(Exception e){
-
+            System.out.println(e);
             return DefaultRes.res(StatusCode.DB_ERROR, "거래 정보 저장 실패");
 
         }
     }
+
+    /**
+     * 거래 정보 목록 열람
+     *
+     * @param
+     * @return DefaultRes
+     */
+    public DefaultRes<List<Transaction>> findAllTransaction(){
+        try{
+            return DefaultRes.res(StatusCode.OK, "거래 정보 목록 열람 성공", transactionRepository.findAll());
+        } catch (Exception e){
+            System.out.println(e);
+            return DefaultRes.res(StatusCode.NOT_FOUND, "거래 정보 목록 열람 성공");
+        }
+    }
+
 }
