@@ -62,4 +62,19 @@ public class TransactionController {
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
+
+    /**
+     * 거래 STEP 변경
+     *
+     * @return ResponseEntity
+     */
+    @GetMapping("/step/{userId}")
+    public ResponseEntity changeTransactionStep(@PathVariable("userId") final int userId) {
+        try {
+            return new ResponseEntity<>(userId,HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("{}", e);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
 }

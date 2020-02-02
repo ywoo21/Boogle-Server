@@ -33,18 +33,21 @@ public class UserService {
     private final JwtService jwtService;
     private final JavaMailSender javaMailSender;
     private final MailContentBuilderService mailContentBuilderService;
+    private final MailSenderService mailSenderService;
 
 
     public UserService(final UserMapper userMapper, final PasswordEncoder passwordEncoder,
                        final UserRepository userRepository, final JwtService jwtService,
                        final JavaMailSender javaMailSender,
-                       final MailContentBuilderService mailContentBuilderService) {
+                       final MailContentBuilderService mailContentBuilderService,
+                       final MailSenderService mailSenderService) {
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.javaMailSender = javaMailSender;
         this.mailContentBuilderService = mailContentBuilderService;
+        this.mailSenderService = mailSenderService;
     }
 
 
@@ -140,22 +143,19 @@ public class UserService {
     public DefaultRes sendAuthEmail(final String email, final String campusEmail) {
         try {
 
-            MimeMessagePreparator messagePreparator = miemMessage -> {
-                MimeMessageHelper messageHelper = new MimeMessageHelper(miemMessage);
-                messageHelper.setFrom("help_admin@bellsoft.co.kr");
-                messageHelper.setTo(campusEmail);
-                messageHelper.setSubject("북을 이메일 인증");
-                String code = Integer.toString(Math.abs(email.hashCode())).substring(0,4);
-                if(code.length() < 4){
-                    String zeroString = "0";
-                    for(int i = 0; i <  4 - code.length(); i++){
-                        zeroString += "0";
-                    }
-                    code = zeroString + code;
+            String code = Integer.toString(Math.abs(email.hashCode())).substring(0,4);
+            if(code.length() < 4){
+                String zeroString = "0";
+                for(int i = 0; i <  4 - code.length(); i++){
+                    zeroString += "0";
                 }
-                String content = mailContentBuilderService.build(code);
-                messageHelper.setText(content,true);
-            };
+                code = zeroString + code;
+            }
+            String content = mailContentBuilderService.buildEmailAuth(code);
+
+            MimeMessagePreparator messagePreparator =
+                    mailSenderService.createMimeMessage(campusEmail, "북을 이메일 인증", content);
+
             javaMailSender.send(messagePreparator);
             return DefaultRes.res(StatusCode.OK, "메일 전송 성공");
         }
