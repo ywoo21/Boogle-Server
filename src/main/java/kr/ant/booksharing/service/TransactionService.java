@@ -10,6 +10,10 @@ import kr.ant.booksharing.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 @Slf4j
 @Service
 public class TransactionService {
@@ -29,13 +33,43 @@ public class TransactionService {
      * @param
      * @return DefaultRes
      */
-    public DefaultRes<Transaction> saveTransaction(final Transaction transaction) {
+    public DefaultRes<Transaction> saveTransaction(Transaction transaction) {
         try{
 
             SellItem sellItem = sellItemRepository.findBy_id(transaction.getSellItemId()).get();
 
             sellItem.setTraded(true);
             sellItemRepository.save(sellItem);
+
+            if(!transactionRepository.findBySellItemId(transaction.getSellItemId()).isPresent()){
+
+                transaction.setTransCreatedTime(new Date());
+
+                Date date = new Date();
+
+                List transactionTimeList = new ArrayList<>();
+
+                transactionTimeList.add(date);
+
+                transaction.setTransactionTimeList(transactionTimeList);
+
+            }
+            else{
+
+                Transaction curTrans =
+                        transactionRepository.findBySellItemId(transaction.getSellItemId()).get();
+
+                List<Date> curTransactionTimeList = curTrans.getTransactionTimeList();
+
+                Date date = new Date();
+
+                curTransactionTimeList.add(date);
+
+                curTrans.setTransactionTimeList(curTransactionTimeList);
+
+                transaction = curTrans;
+
+            }
 
             transactionRepository.save(transaction);
 

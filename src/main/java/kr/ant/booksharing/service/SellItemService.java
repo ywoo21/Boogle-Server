@@ -80,8 +80,11 @@ public class SellItemService {
             sellerUser.setPassword("");
             sellItemRes.setSellerUser(userRepository.findById(sellItem.getSellerId()).get());
 
+            if(token.equals("")){
+                sellItemRes.setBookmarked(false);
+            }
 
-            if(userBookmarkRepository.findByUserIdAndSellItemId
+            else if(userBookmarkRepository.findByUserIdAndSellItemId
                     (userService.authorization(token), sellItem.get_id()).isPresent()){
                 sellItemRes.setBookmarked(true);
             }
