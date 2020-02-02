@@ -36,6 +36,27 @@ public class CustomerInquiryController {
         }
     }
 
+    @GetMapping("/done")
+    public ResponseEntity getAllDoneCustomerInquiries(){
+        try {
+            return new ResponseEntity<>(customerInquiryService.findAllDoneCustomerInquiries(), HttpStatus.OK);
+        } catch (Exception e){
+            log.error("{}", e);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/undone")
+    public ResponseEntity getAllUnDoneCustomerInquiries(){
+        try {
+            return new ResponseEntity<>(customerInquiryService.findAllUnDoneCustomerInquiries(), HttpStatus.OK);
+        } catch (Exception e){
+            log.error("{}", e);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+
     @PostMapping("")
     public ResponseEntity saveCustomerInquiry(@RequestBody final CustomerInquiryReq customerInquiryReq){
         try {
@@ -47,6 +68,16 @@ public class CustomerInquiryController {
         } catch (Exception e){
             log.error("{}", e);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PostMapping("/changeStatus")
+    public ResponseEntity changeCustomerInquiryStatus(@RequestParam(value="customerInquiryId") String customerInquiryId){
+        try{
+            return new ResponseEntity<>(customerInquiryService.changeStatus(customerInquiryId), HttpStatus.OK);
+        } catch (Exception e){
+            log.error("{}", e);
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
     }
 }
