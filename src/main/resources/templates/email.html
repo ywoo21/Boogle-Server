@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>spring boot email test</title>
+</head>
+<body>
+<div style="width : 50%; height : 200px; margin : 10vh auto 0vh auto; border : 1px solid #339eac;">
+    <h1 style="margin : auto; text-align: center; color :#339eac ">이메일 인증</h1>
+    <h5 style="margin : 7vh auto 0vh auto; text-align: center;">인증 코드 : </h5>
+    <h5 th:text="${message}" style="margin : auto; text-align: center;">1234</h5>
+</div>
+</body>
+</html>

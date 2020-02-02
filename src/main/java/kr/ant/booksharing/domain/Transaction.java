@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Document("transaction")
@@ -21,11 +22,11 @@ public class Transaction {
 
     private int transactionType;
 
-    private Date sellerTime = new Date();
-    private Date buyerTime = new Date();
+    private List<Date> transactionTimeList;
 
-    private int sellerStep;
-    private int buyerStep;
+    private Date transCreatedTime;
+
+    private int step;
 
     private String boxId;
     private String boxPassword;

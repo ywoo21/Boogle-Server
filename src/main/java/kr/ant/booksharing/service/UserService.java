@@ -4,15 +4,21 @@ import kr.ant.booksharing.dao.UserMapper;
 import kr.ant.booksharing.domain.User;
 import kr.ant.booksharing.model.DefaultRes;
 import kr.ant.booksharing.model.SignIn.SignInReq;
+import kr.ant.booksharing.model.UserModificationReq;
+import kr.ant.booksharing.model.UserModificationRes;
 import kr.ant.booksharing.repository.UserRepository;
 import kr.ant.booksharing.utils.ResponseMessage;
 import kr.ant.booksharing.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import java.util.Optional;
 import java.util.Random;
 
@@ -26,16 +32,19 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final JavaMailSender javaMailSender;
+    private final MailContentBuilderService mailContentBuilderService;
 
 
     public UserService(final UserMapper userMapper, final PasswordEncoder passwordEncoder,
                        final UserRepository userRepository, final JwtService jwtService,
-                       final JavaMailSender javaMailSender) {
+                       final JavaMailSender javaMailSender,
+                       final MailContentBuilderService mailContentBuilderService) {
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.javaMailSender = javaMailSender;
+        this.mailContentBuilderService = mailContentBuilderService;
     }
 
 
@@ -130,20 +139,24 @@ public class UserService {
      */
     public DefaultRes sendAuthEmail(final String email, final String campusEmail) {
         try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom("boogleforus@gmail.com");
-            message.setTo(campusEmail);
-            message.setSubject("북을 이메일 인증");
-            String code = Integer.toString(Math.abs(email.hashCode())).substring(0,4);
-            if(code.length() < 4){
-                String zeroString = "0";
-                for(int i = 0; i <  4 - code.length(); i++){
-                    zeroString += "0";
+
+            MimeMessagePreparator messagePreparator = miemMessage -> {
+                MimeMessageHelper messageHelper = new MimeMessageHelper(miemMessage);
+                messageHelper.setFrom("help_admin@bellsoft.co.kr");
+                messageHelper.setTo(campusEmail);
+                messageHelper.setSubject("북을 이메일 인증");
+                String code = Integer.toString(Math.abs(email.hashCode())).substring(0,4);
+                if(code.length() < 4){
+                    String zeroString = "0";
+                    for(int i = 0; i <  4 - code.length(); i++){
+                        zeroString += "0";
+                    }
+                    code = zeroString + code;
                 }
-                code = zeroString + code;
-            }
-            message.setText("인증 코드 : " + code);
-            javaMailSender.send(message);
+                String content = mailContentBuilderService.build(code);
+                messageHelper.setText(content,true);
+            };
+            javaMailSender.send(messagePreparator);
             return DefaultRes.res(StatusCode.OK, "메일 전송 성공");
         }
         catch(Exception e){
@@ -181,6 +194,64 @@ public class UserService {
         catch(Exception e){
             System.out.println(e);
             return DefaultRes.res(StatusCode.BAD_REQUEST, "이메일 인증 실패");
+        }
+    }
+
+    /**
+     * 회원 정보 변경 시 현재 회원 정보 조회
+     *
+     * @param userIdx 회원 고유 번호
+     * @return DefaultRes
+     */
+    public DefaultRes findCurrentUserForUserModification(final int userIdx) {
+        try {
+
+            User user = userRepository.findById(userIdx).get();
+            UserModificationRes userModificationRes =
+                    UserModificationRes.builder()
+                        .email(user.getEmail())
+                        .name(user.getName())
+                        .nickname(user.getNickname())
+                        .major(user.getMajor())
+                        .semester(user.getSemester())
+                        .phoneNumber(user.getPhoneNumber())
+                        .build();
+
+            return DefaultRes.res(StatusCode.OK, "회원 정보 조회 성공", userModificationRes);
+
+        } catch (Exception e) {
+            System.out.println(e);
+            return DefaultRes.res(StatusCode.DB_ERROR, "회원 정보 조회 실패ㅡ");
+        }
+    }
+
+    /**
+     * 회원 정보 변경
+     *
+     * @param userIdx 회원 고유 번호
+     * @return DefaultRes
+     */
+    public DefaultRes modifyUser(final UserModificationReq userModificationReq,
+                                 final int userIdx) {
+        try {
+            User user = userRepository.findById(userIdx).get();
+
+            if(!userModificationReq.getEmail().equals("")) user.setEmail(userModificationReq.getEmail());
+            if(!userModificationReq.getName().equals("")) user.setName(userModificationReq.getName());
+            if(!userModificationReq.getNickname().equals("")) user.setNickname(userModificationReq.getNickname());
+            if(!userModificationReq.getMajor().equals("")) user.setMajor(userModificationReq.getMajor());
+            if(!userModificationReq.getSemester().equals("")) user.setSemester(userModificationReq.getSemester());
+            if(!userModificationReq.getPhoneNumber().equals("")) user.setPhoneNumber(userModificationReq.getPhoneNumber());
+
+            if(!userModificationReq.getPassword().equals(""))
+                user.setPassword(passwordEncoder.encode(userModificationReq.getPassword()));
+
+            userRepository.save(user);
+
+            return DefaultRes.res(StatusCode.CREATED, "회원 정보 수정 성공");
+        } catch (Exception e) {
+            System.out.println(e);
+            return DefaultRes.res(StatusCode.DB_ERROR, "회원 정보 수정 실패");
         }
     }
 

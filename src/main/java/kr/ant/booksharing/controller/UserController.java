@@ -4,12 +4,15 @@ import kr.ant.booksharing.domain.User;
 import kr.ant.booksharing.model.DefaultRes;
 import kr.ant.booksharing.model.SignIn.SignInReq;
 import kr.ant.booksharing.model.SignUp.SignUpReq;
+import kr.ant.booksharing.model.UserModificationReq;
 import kr.ant.booksharing.service.UserService;
+import kr.ant.booksharing.utils.auth.Auth;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Locale;
 
 import static kr.ant.booksharing.model.DefaultRes.FAIL_DEFAULT_RES;
@@ -99,6 +102,41 @@ public class UserController {
                                     @RequestParam("campusEmail") final String campusEmail) {
         try {
             return new ResponseEntity<>(userService.sendAuthEmail(email, campusEmail), HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("{}", e);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
+     * 회원 정보 변경 시 현재 회원 정보 조회
+     *
+     * @return ResponseEntity
+     */
+    @Auth
+    @GetMapping("/modification")
+    public ResponseEntity getCurrentUser(final HttpServletRequest httpServletRequest) {
+        try {
+            final int userIdx = (int) httpServletRequest.getAttribute("userIdx");
+            return new ResponseEntity<>(userService.findCurrentUserForUserModification(userIdx), HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("{}", e);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
+     * 회원 정보 변경
+     *
+     * @return ResponseEntity
+     */
+    @Auth
+    @PostMapping("/modification")
+    public ResponseEntity modifyUser(@RequestBody final UserModificationReq userModificationReq,
+                                     final HttpServletRequest httpServletRequest) {
+        try {
+            final int userIdx = (int) httpServletRequest.getAttribute("userIdx");
+            return new ResponseEntity<>(userService.modifyUser(userModificationReq, userIdx), HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);

@@ -82,9 +82,13 @@ public class NaverBookApiController {
                     itemResList.add(itemRes);
                 }
             }
+
+            List<ItemRes> tempItemList = itemResList;
+
             if(getAllBooksFromNaverBookApi(itemIdList, keyword).equals("")){
                 return new ResponseEntity<>(itemResList, HttpStatus.OK);
             }
+
             String booksFromNaverBookApi = getAllBooksFromNaverBookApi(itemIdList, keyword);
             JSONParser parser = new JSONParser();
 
@@ -97,11 +101,26 @@ public class NaverBookApiController {
                 obj = ((org.json.simple.JSONObject)obj).get("channel");
                 obj = ((org.json.simple.JSONObject)obj).get("item");
                 jsonArray = (org.json.simple.JSONArray)obj;
+
                 for (int i = 0; i < jsonArray.size(); i++) {
                     ItemRes itemRes = new ItemRes();
                     org.json.simple.JSONObject jsonObject = (org.json.simple.JSONObject)jsonArray.get(i);
-                    if(jsonObject.get("isbn").toString().length() > 11)
-                        itemRes.setItemId(jsonObject.get("isbn").toString().substring(11));
+
+                    if(jsonObject.get("isbn").toString().length() > 11) {
+                        String itemId = jsonObject.get("isbn").toString().substring(11);
+                        boolean isDoubled = false;
+                        for(ItemRes tempItemRes : tempItemList){
+                            if(tempItemRes.getItemId().equals(itemId)) {
+                                isDoubled = true;
+                                break;
+                            }
+                        }
+
+                        if(isDoubled == true) continue;
+
+                        itemRes.setItemId(itemId);
+                    }
+
                     itemRes.setTitle(jsonObject.get("title").toString()
                             .replace("<b>", "").replace("</b>", ""));
                     itemRes.setAuthor(jsonObject.get("author").toString()
