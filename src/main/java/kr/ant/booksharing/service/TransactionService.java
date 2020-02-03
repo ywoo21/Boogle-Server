@@ -3,8 +3,8 @@ package kr.ant.booksharing.service;
 import kr.ant.booksharing.domain.SellItem;
 import kr.ant.booksharing.domain.Transaction;
 import kr.ant.booksharing.domain.TransactionHistory;
+import kr.ant.booksharing.model.BoogleBoxInfo;
 import kr.ant.booksharing.model.DefaultRes;
-import kr.ant.booksharing.model.SellItemRes;
 import kr.ant.booksharing.repository.SellItemRepository;
 import kr.ant.booksharing.repository.TransactionHistoryRepository;
 import kr.ant.booksharing.repository.TransactionRepository;
@@ -109,12 +109,13 @@ public class TransactionService {
                             .build();
 
             transactionHistoryRepository.save(transactionHistory);
+
             String content = mailContentBuilderService.buildTransRequest(sellItem);
-            System.out.println(userRepository.findById(sellItem.getSellerId()).get().getEmail());
             MimeMessagePreparator mimeMessagePreparator =
                     mailSenderService.createMimeMessage(userRepository.findById(sellItem.getSellerId()).get().getEmail(),
                     "구매 요청", content);
             javaMailSender.send(mimeMessagePreparator);
+
             return DefaultRes.res(StatusCode.CREATED, "거래 정보 저장 성공");
 
         }
@@ -141,81 +142,61 @@ public class TransactionService {
     }
 
     /**
-     * 거래 정보 저장
+     * 거래 STEP 변경
      *
      * @param
      * @return DefaultRes
      */
-    public DefaultRes<Transaction> changeTransactionStep(Transaction transaction) {
+    public DefaultRes<Transaction> changeTransactionStep(final String sellItemId) {
         try{
+            Transaction transaction = transactionRepository.findBySellItemId(sellItemId).get();
+            transaction.setStep(transaction.getStep() + 1);
 
-            SellItem sellItem = sellItemRepository.findBy_id(transaction.getSellItemId()).get();
+            List<Date> currentTransactionTimeList = transaction.getTransactionTimeList();
+            currentTransactionTimeList.add(new Date());
 
-            sellItem.setTraded(true);
-            sellItemRepository.save(sellItem);
-
-            if(!transactionRepository.findBySellItemId(transaction.getSellItemId()).isPresent()){
-
-                transaction.setTransCreatedTime(new Date());
-
-                Date date = new Date();
-
-                List transactionTimeList = new ArrayList<>();
-
-                transactionTimeList.add(date);
-
-                transaction.setTransactionTimeList(transactionTimeList);
-
-            }
-            else{
-
-                Transaction curTrans =
-                        transactionRepository.findBySellItemId(transaction.getSellItemId()).get();
-
-                List<Date> curTransactionTimeList = curTrans.getTransactionTimeList();
-
-                Date date = new Date();
-
-                curTransactionTimeList.add(date);
-
-                curTrans.setTransactionTimeList(curTransactionTimeList);
-
-                transaction = curTrans;
-
-            }
-
-            final String id  = transactionRepository.save(transaction).get_id();
-
-            TransactionHistory transactionHistory =
-
-                    TransactionHistory.builder()
-                            ._id(id)
-                            .boxId(transaction.getBoxId())
-                            .transactionTimeList(transaction.getTransactionTimeList())
-                            .transactionType(transaction.getTransactionType())
-                            .boxPassword(transaction.getBoxPassword())
-                            .buyerId(transaction.getBuyerId())
-                            .sellerId(transaction.getSellerId())
-                            .sellItemId(transaction.getSellItemId())
-                            .transCreatedTime(transaction.getTransCreatedTime())
-                            .step(transaction.getStep())
-                            .build();
-
-            transactionHistoryRepository.save(transactionHistory);
-            String content = mailContentBuilderService.buildTransRequest(sellItem);
-            System.out.println(userRepository.findById(sellItem.getSellerId()).get().getEmail());
-            MimeMessagePreparator mimeMessagePreparator =
-                    mailSenderService.createMimeMessage(userRepository.findById(sellItem.getSellerId()).get().getEmail(),
-                            "구매 요청", content);
-            javaMailSender.send(mimeMessagePreparator);
-            return DefaultRes.res(StatusCode.CREATED, "거래 정보 저장 성공");
-
+            transaction.setTransactionTimeList(currentTransactionTimeList);
+            return DefaultRes.res(StatusCode.CREATED, "거래 STEP 변경 성공");
         }
         catch(Exception e){
             System.out.println(e);
-            return DefaultRes.res(StatusCode.DB_ERROR, "거래 정보 저장 실패");
-
+            return DefaultRes.res(StatusCode.DB_ERROR, "거래 STEP 변경 실패");
         }
     }
 
+    /**
+     * 북을 박스 정보 저장
+     *
+     * @param
+     * @return DefaultRes
+     */
+    public DefaultRes<Transaction> saveBoogleBoxIdAndPassword(final BoogleBoxInfo boogleBoxInfo) {
+        try{
+            Transaction transaction = transactionRepository.findBySellItemId(boogleBoxInfo.getSellItemId()).get();
+            transaction.setBoxId(boogleBoxInfo.getId());
+            transaction.setBoxPassword(boogleBoxInfo.getPassword());
+            return DefaultRes.res(StatusCode.CREATED, "북을 박스 정보 저장");
+        }
+        catch(Exception e){
+            System.out.println(e);
+            return DefaultRes.res(StatusCode.DB_ERROR, "북을 박스 정보 실패");
+        }
+    }
+
+    /**
+     * 거래 삭제
+     *
+     * @param
+     * @return DefaultRes
+     */
+    public DefaultRes<Transaction> deleteTransaction(final String sellItemId) {
+        try{
+            transactionRepository.deleteBySellItemId(sellItemId);
+            return DefaultRes.res(StatusCode.OK, "거래 취소 성공");
+        }
+        catch(Exception e){
+            System.out.println(e);
+            return DefaultRes.res(StatusCode.DB_ERROR, "거래 취소 실패");
+        }
+    }
 }

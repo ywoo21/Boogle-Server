@@ -3,6 +3,7 @@ package kr.ant.booksharing.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.ant.booksharing.domain.SellItem;
 import kr.ant.booksharing.domain.Transaction;
+import kr.ant.booksharing.model.BoogleBoxInfo;
 import kr.ant.booksharing.model.BoogleBoxReq;
 import kr.ant.booksharing.model.SellItemReq;
 import kr.ant.booksharing.service.TransactionService;
@@ -68,10 +69,40 @@ public class TransactionController {
      *
      * @return ResponseEntity
      */
-    @GetMapping("/step/{userId}")
-    public ResponseEntity changeTransactionStep(@PathVariable("userId") final int userId) {
+    @GetMapping("/step")
+    public ResponseEntity changeTransactionStep(@RequestParam("sellItemId")final String sellItemId) {
         try {
-            return new ResponseEntity<>(userId,HttpStatus.OK);
+            return new ResponseEntity<>(transactionService.changeTransactionStep(sellItemId),HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("{}", e);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
+     * 북을 박스 정보 저장
+     *
+     * @return ResponseEntity
+     */
+    @PostMapping("/booglebox")
+    public ResponseEntity changeTransactionStep(@RequestBody BoogleBoxInfo boogleBoxInfo) {
+        try {
+            return new ResponseEntity<>(transactionService.saveBoogleBoxIdAndPassword(boogleBoxInfo),HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("{}", e);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
+     * 거래 취소
+     *
+     * @return ResponseEntity
+     */
+    @DeleteMapping("")
+    public ResponseEntity cancelTransaction(@RequestParam("sellItemId")final String sellItemId) {
+        try {
+            return new ResponseEntity<>(transactionService.deleteTransaction(sellItemId),HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
