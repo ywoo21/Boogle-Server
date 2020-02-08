@@ -9,6 +9,7 @@ import kr.ant.booksharing.repository.UserRepository;
 import kr.ant.booksharing.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -17,11 +18,14 @@ import java.util.*;
 public class CustomerInquiryService {
     private final CustomerInquiryRepository customerInquiryRepository;
     private final UserRepository userRepository;
+    private final S3FileUploadService s3FileUploadService;
 
     public CustomerInquiryService(final CustomerInquiryRepository customerInquiryRepository,
-                                  final UserRepository userRepository){
+                                  final UserRepository userRepository,
+                                  final S3FileUploadService s3FileUploadService){
         this.customerInquiryRepository = customerInquiryRepository;
         this.userRepository = userRepository;
+        this.s3FileUploadService = s3FileUploadService;
     }
 
     /**
@@ -111,7 +115,7 @@ public class CustomerInquiryService {
      * @param customerInquiry 고객의 소리
      * @return DefaultRes
      */
-    public DefaultRes saveCustomerInquiry(final int userId, CustomerInquiry customerInquiry) {
+    public DefaultRes saveCustomerInquiry(final int userId, final CustomerInquiry customerInquiry, final List<MultipartFile> imageFileList) {
         try {
             // 비회원일 떄
             if(userId == -1) {
@@ -122,8 +126,15 @@ public class CustomerInquiryService {
                 customerInquiry.setIsMember(true);
                 customerInquiry.setEmail(userRepository.findById(userId).get().getEmail());
             }
-            customerInquiry.setStatus(false);
-            customerInquiry.setDate(new Date());
+            //이미지 파일 처리
+            List<String> imageUrlList = new ArrayList<>();
+            for(MultipartFile m : imageFileList){
+                imageUrlList.add(s3FileUploadService.upload(m));
+            }
+            customerInquiry.setImageUrlList(imageUrlList);
+
+            customerInquiry.setStatus(false); // 운영진이 해당 문의를 처리한지 여부 초기화
+            customerInquiry.setDate(new Date()); // 생성 시점 저장
             customerInquiryRepository.save(customerInquiry);
             return DefaultRes.res(StatusCode.CREATED, "고객의 소리 저장 성공");
         } catch (Exception e) {

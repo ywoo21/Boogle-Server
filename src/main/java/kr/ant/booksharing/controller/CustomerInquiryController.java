@@ -10,8 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -58,13 +60,15 @@ public class CustomerInquiryController {
 
 
     @PostMapping("")
-    public ResponseEntity saveCustomerInquiry(@RequestBody final CustomerInquiryReq customerInquiryReq){
+    public ResponseEntity saveCustomerInquiry(final CustomerInquiryReq customerInquiryReq,
+                                              @RequestPart(value="imageFileList", required = false)
+                                              final List<MultipartFile> imageFileList){
         try {
             CustomerInquiry customerInquiry = customerInquiryReq.getCustomerInquiry();
             final String jwt = customerInquiryReq.getToken();
             int userIdx = -1;
             if(!jwt.equals("")) userIdx = userService.authorization(jwt);
-            return new ResponseEntity<>(customerInquiryService.saveCustomerInquiry(userIdx, customerInquiry), HttpStatus.OK);
+            return new ResponseEntity<>(customerInquiryService.saveCustomerInquiry(userIdx, customerInquiry, imageFileList), HttpStatus.OK);
         } catch (Exception e){
             log.error("{}", e);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
