@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>spring boot email test</title>
+</head>
+<body>
+<div style="width : 50%; height : 200px; margin : 10vh auto 0vh auto; border : 1px solid #339eac;">
+        <div>
+            <span>책 제목 : </span>
+            <span th:text=" ${title}" style="margin : auto; text-align: center;"></span>
+        </div>
+        <div>
+            <span>판매 등록가 : </span>
+            <span th:text=" ${regiPrice}" style="margin : auto; text-align: center;"></span>
+        </div>
+        <div>
+            <span>판매 등록 시간 : </span>
+            <span th:text=" ${regiTime}" style="margin : auto; text-align: center;"></span>
+        </div>
+        <div>
+            <button type="button"><a href="http://boogle.shop.s3-website.ap-northeast-2.amazonaws.com/myPage">구매 수락 하러 가기</a></button>
+        </div>
+</div>
+</body>
+</html>

@@ -7,9 +7,22 @@
 </head>
 <body>
 <div style="width : 50%; height : 200px; margin : 10vh auto 0vh auto; border : 1px solid #339eac;">
-    <h1 style="margin : auto; text-align: center; color :#339eac ">이메일 인증</h1>
-    <h5 style="margin : 7vh auto 0vh auto; text-align: center;">인증 코드 : </h5>
-    <h5 style="margin : auto; text-align: center;">1234</h5>
+    <div>
+        <span>책 제목 : </span>
+        <span th:text=" ${title}" style="margin : auto; text-align: center;"></span>
+    </div>
+    <div>
+        <span>판매 등록가 : </span>
+        <span th:text=" ${regiPrice}" style="margin : auto; text-align: center;"></span>
+    </div>
+    <div>
+        <span>판매 등록 시간 : </span>
+        <span th:text=" ${regiTime}" style="margin : auto; text-align: center;"></span>
+    </div>
+    <div>
+        <button type="submit">구매 수락</button>
+        <button>구매 거절</button>
+    </div>
 </div>
 </body>
 </html>

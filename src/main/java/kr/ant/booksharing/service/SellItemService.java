@@ -2,6 +2,7 @@ package kr.ant.booksharing.service;
 
 import kr.ant.booksharing.domain.Item;
 import kr.ant.booksharing.domain.SellItem;
+import kr.ant.booksharing.domain.SellItemHistory;
 import kr.ant.booksharing.domain.User;
 import kr.ant.booksharing.model.*;
 import kr.ant.booksharing.repository.*;
@@ -20,6 +21,7 @@ import java.util.List;
 public class SellItemService {
 
     private final SellItemRepository sellItemRepository;
+    private final SellItemHistoryRepository sellItemHistoryRepository;
     private final RegiImageRepository regiImageRepository;
     private final S3FileUploadService s3FileUploadService;
     private final ItemRepository itemRepository;
@@ -28,6 +30,7 @@ public class SellItemService {
     private final UserService userService;
 
     public SellItemService(final SellItemRepository sellItemRepository,
+                           final SellItemHistoryRepository sellItemHistoryRepository,
                            final S3FileUploadService s3FileUploadService,
                            final RegiImageRepository regiImageRepository,
                            final ItemRepository itemRepository,
@@ -35,6 +38,7 @@ public class SellItemService {
                            final UserBookmarkRepository userBookmarkRepository,
                            final UserService userService) {
         this.sellItemRepository = sellItemRepository;
+        this.sellItemHistoryRepository = sellItemHistoryRepository;
         this.s3FileUploadService = s3FileUploadService;
         this.regiImageRepository = regiImageRepository;
         this.itemRepository = itemRepository;
@@ -137,14 +141,36 @@ public class SellItemService {
                 itemRepository.save(item);
             }
 
-            sellItemRepository.save(sellItem);
+            String id = sellItemRepository.save(sellItem).get_id();
+
+            SellItemHistory sellItemHistory =
+                    SellItemHistory.builder()
+                        ._id(id)
+                        .itemId(sellItem.getItemId())
+                        .author(sellItem.getAuthor())
+                        .comment(sellItem.getComment())
+                        .dealType(sellItem.getDealType())
+                        .imageUrl(sellItem.getImageUrl())
+                        .isTraded(sellItem.isTraded())
+                        .price(sellItem.getPrice())
+                        .pubdate(sellItem.getPubdate())
+                        .publisher(sellItem.getPublisher())
+                        .qualityIn(sellItem.getQualityIn())
+                        .qualityOut(sellItem.getQualityOut())
+                        .regiImageUrlList(sellItem.getRegiImageUrlList())
+                        .title(sellItem.getTitle())
+                        .regiTime(sellItem.getRegiTime())
+                        .sellerId(sellItem.getSellerId())
+                        .regiPrice(sellItem.getRegiPrice())
+                        .build();
+
+            sellItemHistoryRepository.save(sellItemHistory);
 
             return DefaultRes.res(StatusCode.CREATED, "물품 정보 등록 성공");
 
         }
         catch(Exception e){
 
-            e.printStackTrace();
             System.out.println(e);
 
             return DefaultRes.res(StatusCode.DB_ERROR, "물품 정보 등록 실패");
