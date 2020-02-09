@@ -1,6 +1,5 @@
 package kr.ant.booksharing.service;
 
-import kr.ant.booksharing.dao.UserMapper;
 import kr.ant.booksharing.domain.User;
 import kr.ant.booksharing.model.DefaultRes;
 import kr.ant.booksharing.model.SignIn.SignInReq;
@@ -10,15 +9,11 @@ import kr.ant.booksharing.repository.UserRepository;
 import kr.ant.booksharing.utils.ResponseMessage;
 import kr.ant.booksharing.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import java.util.Optional;
 import java.util.Random;
 
@@ -27,7 +22,6 @@ import java.util.Random;
 @Service
 public class UserService {
 
-    private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -36,12 +30,11 @@ public class UserService {
     private final MailSenderService mailSenderService;
 
 
-    public UserService(final UserMapper userMapper, final PasswordEncoder passwordEncoder,
+    public UserService(final PasswordEncoder passwordEncoder,
                        final UserRepository userRepository, final JwtService jwtService,
                        final JavaMailSender javaMailSender,
                        final MailContentBuilderService mailContentBuilderService,
                        final MailSenderService mailSenderService) {
-        this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.jwtService = jwtService;
@@ -62,11 +55,15 @@ public class UserService {
             String encodedPassword = passwordEncoder.encode(user.getPassword());
             user.setPassword(encodedPassword);
             System.out.println(user.toString());
-            userRepository.save(user);
-            return DefaultRes.res(StatusCode.CREATED, "회원 정보 저장 성공");
+            int userId = userRepository.save(user).getId();
+
+            final JwtService.TokenRes tokenRes =
+                    new JwtService.TokenRes(jwtService.create(userId));
+
+            return DefaultRes.res(StatusCode.CREATED, "회원 정보 저장 성공", tokenRes.getToken());
         } catch (Exception e) {
             System.out.println(e);
-            return DefaultRes.res(StatusCode.DB_ERROR, "회원 정보 저장 실패");
+            return DefaultRes.res(StatusCode.DB_ERROR, "회원 정보 저장 실패", "");
         }
     }
 
@@ -93,6 +90,32 @@ public class UserService {
         } catch (Exception e) {
             System.out.println(e);
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
+        }
+    }
+
+    /**
+     * 회원 정보 인증
+     *
+     * @param signInReq 회원 데이터
+     * @return DefaultRes
+     */
+    public String getUserToken(final SignInReq signInReq) {
+        try {
+            if(userRepository.findByEmail(signInReq.getEmail()).isPresent()){
+                User user = userRepository.findByEmail(signInReq.getEmail()).get();
+                if(passwordEncoder.matches(signInReq.getPassword(), user.getPassword())){
+                    final JwtService.TokenRes tokenRes =
+                            new JwtService.TokenRes(jwtService.create(user.getId()));
+                    return tokenRes.getToken();
+                }
+                else { return ""; }
+            }
+            else{
+                return "";
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+            return "";
         }
     }
     /**
@@ -140,10 +163,11 @@ public class UserService {
      *
      * @return DefaultRes
      */
-    public DefaultRes sendAuthEmail(final String email, final String campusEmail) {
+    public DefaultRes sendAuthEmail(final String userName, final String email, final String campusEmail) {
         try {
 
             String code = Integer.toString(Math.abs(email.hashCode())).substring(0,4);
+
             if(code.length() < 4){
                 String zeroString = "0";
                 for(int i = 0; i <  4 - code.length(); i++){
@@ -151,7 +175,7 @@ public class UserService {
                 }
                 code = zeroString + code;
             }
-            String content = mailContentBuilderService.buildEmailAuth(code);
+            String content = mailContentBuilderService.buildEmailAuth(userName, code);
 
             MimeMessagePreparator messagePreparator =
                     mailSenderService.createMimeMessage(campusEmail, "북을 이메일 인증", content);
@@ -212,7 +236,7 @@ public class UserService {
                         .email(user.getEmail())
                         .name(user.getName())
                         .nickname(user.getNickname())
-                        .major(user.getMajor())
+                        .major(user.getMajorList())
                         .semester(user.getSemester())
                         .phoneNumber(user.getPhoneNumber())
                         .build();
@@ -239,7 +263,7 @@ public class UserService {
             if(!userModificationReq.getEmail().equals("")) user.setEmail(userModificationReq.getEmail());
             if(!userModificationReq.getName().equals("")) user.setName(userModificationReq.getName());
             if(!userModificationReq.getNickname().equals("")) user.setNickname(userModificationReq.getNickname());
-            if(!userModificationReq.getMajor().equals("")) user.setMajor(userModificationReq.getMajor());
+            if(!userModificationReq.getMajor().equals("")) user.setMajorList(userModificationReq.getMajor());
             if(!userModificationReq.getSemester().equals("")) user.setSemester(userModificationReq.getSemester());
             if(!userModificationReq.getPhoneNumber().equals("")) user.setPhoneNumber(userModificationReq.getPhoneNumber());
 
@@ -255,21 +279,6 @@ public class UserService {
         }
     }
 
-    /**
-     * 회원 비밀번호 변경
-     *
-     * @param signInReq 회원 이메일
-     * @return DefaultRes
-     */
-    public DefaultRes modifyPassword(final SignInReq signInReq) {
-        try {
-            userMapper.changeUserPassword(signInReq.getEmail(), passwordEncoder.encode(signInReq.getPassword()));
-            return DefaultRes.res(StatusCode.CREATED, ResponseMessage.CHANGED_PWD);
-        } catch (Exception e) {
-            System.out.println(e);
-            return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
-        }
-    }
 
     /**
      * @return 인증을 위해 사용자에게 전달 될 네 자리의 인증 번호

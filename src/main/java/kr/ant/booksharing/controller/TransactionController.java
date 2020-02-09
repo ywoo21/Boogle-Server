@@ -1,21 +1,14 @@
 package kr.ant.booksharing.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.ant.booksharing.domain.SellItem;
 import kr.ant.booksharing.domain.Transaction;
 import kr.ant.booksharing.model.BoogleBoxInfo;
-import kr.ant.booksharing.model.BoogleBoxReq;
-import kr.ant.booksharing.model.SellItemReq;
 import kr.ant.booksharing.service.TransactionService;
 import kr.ant.booksharing.utils.auth.Auth;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 import static kr.ant.booksharing.model.DefaultRes.FAIL_DEFAULT_RES;
 
