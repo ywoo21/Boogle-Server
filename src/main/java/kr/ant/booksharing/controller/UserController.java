@@ -92,16 +92,34 @@ public class UserController {
     }
 
     /**
-     * 이메일 인증
+     * 인증 이메일 전송
      *
      * @param email 회원 이메일 주소
      * @return ResponseEntity
      */
     @GetMapping("/signup/authNumber")
-    public ResponseEntity emailAuth(@RequestParam("email") final String email,
+    public ResponseEntity emailAuth(@RequestParam("userName") final String userName,
+                                    @RequestParam("email") final String email,
                                     @RequestParam("campusEmail") final String campusEmail) {
         try {
-            return new ResponseEntity<>(userService.sendAuthEmail(email, campusEmail), HttpStatus.OK);
+            return new ResponseEntity<>(userService.sendAuthEmail(userName, email, campusEmail), HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("{}", e);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
+     * 이메일 인증
+     *
+     * @param email 회원 이메일 주소
+     * @return ResponseEntity
+     */
+    @GetMapping("/signup/authEmail")
+    public ResponseEntity emailAuth(@RequestParam("email") final String email,
+                                    @RequestParam("authCode") final String authCode) {
+        try {
+            return new ResponseEntity<>(userService.emailAuth(email, authCode), HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
@@ -137,22 +155,6 @@ public class UserController {
         try {
             final int userIdx = (int) httpServletRequest.getAttribute("userIdx");
             return new ResponseEntity<>(userService.modifyUser(userModificationReq, userIdx), HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("{}", e);
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
-        }
-    }
-
-    /**
-     * 비밀번호 찾기
-     *
-     * @param signInReq 회원 데이터
-     * @return ResponseEntity
-     */
-    @PostMapping("/change/password")
-    public ResponseEntity changePassword(@RequestBody SignInReq signInReq) {
-        try {
-            return new ResponseEntity<>(userService.modifyPassword(signInReq), HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);

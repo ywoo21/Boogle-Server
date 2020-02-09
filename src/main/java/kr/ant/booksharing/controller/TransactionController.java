@@ -2,8 +2,6 @@ package kr.ant.booksharing.controller;
 
 import kr.ant.booksharing.domain.Transaction;
 import kr.ant.booksharing.model.BoogleBoxInfo;
-import kr.ant.booksharing.model.BoogleBoxReq;
-import kr.ant.booksharing.model.SellItemReq;
 import kr.ant.booksharing.service.TransactionService;
 import kr.ant.booksharing.utils.auth.Auth;
 import lombok.extern.slf4j.Slf4j;
