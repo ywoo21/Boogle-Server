@@ -7,6 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Document("customer_inquiry")
@@ -18,6 +19,7 @@ public class CustomerInquiry {
     private String email;
     private Integer type;
     private String msg;
+    private List<String> imageUrlList;
     private Boolean isMember;
     private Boolean status;
     private Date date;
