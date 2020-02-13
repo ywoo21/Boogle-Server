@@ -31,3 +31,8 @@
 - Spring Boot Mail
 - Spring Boot Thymeleaf
 - JSON Simple
+
+## Used Database
+
+- MySQL (user)
+- MongoDB (item, sell_item, sell_item_history, transaction, transaction_history, user_bookmark, customer_inquiry, major) 
