@@ -95,7 +95,7 @@ public class HomeService {
             List<Item> mostRegisteredItemList = itemRepository.findByOrderByRegiCountDesc().get();
 
             for(Item item : mostRegisteredItemList){
-                if(recentRegisteredSellItemList.size() > 4) break;
+                if(recentRegisteredSellItemList.size() > 3) break;
                 if(sellItemRepository.findAllByItemId(item.getItemId()).isPresent()){
                     recentRegisteredSellItemList.addAll(sellItemRepository.findAllByItemId(item.getItemId()).get());
                 }

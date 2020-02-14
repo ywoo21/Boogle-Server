@@ -14,6 +14,7 @@ import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
@@ -75,18 +76,38 @@ public class UserService {
      */
     public DefaultRes authUser(final SignInReq signInReq) {
         try {
-            if(userRepository.findByEmail(signInReq.getEmail()).isPresent()){
-                User user = userRepository.findByEmail(signInReq.getEmail()).get();
-                if(passwordEncoder.matches(signInReq.getPassword(), user.getPassword())){
-                    final JwtService.TokenRes tokenRes =
-                            new JwtService.TokenRes(jwtService.create(user.getId()));
-                    return DefaultRes.res(StatusCode.OK, "로그인 성공",tokenRes.getToken());
+            if(signInReq.getEmail().contains("@")){
+                if(userRepository.findByEmail(signInReq.getEmail()).isPresent()){
+                    User user = userRepository.findByEmail(signInReq.getEmail()).get();
+                    if(passwordEncoder.matches(signInReq.getPassword(), user.getPassword())){
+                        final JwtService.TokenRes tokenRes =
+                                new JwtService.TokenRes(jwtService.create(user.getId()));
+                        return DefaultRes.res(StatusCode.OK, "로그인 성공",tokenRes.getToken());
+                    }
+                    else { return DefaultRes.res(StatusCode.NOT_FOUND, "로그인 실패 ");}
                 }
-                else { return DefaultRes.res(StatusCode.NOT_FOUND, "로그인 실패 ");}
+                else{
+                    return DefaultRes.res(StatusCode.NOT_FOUND, "로그인 실패 ");
+                }
             }
             else{
-                return DefaultRes.res(StatusCode.NOT_FOUND, "로그인 실패 ");
+                if(userRepository.findAllByEmailContaining(signInReq.getEmail()).isPresent()){
+                    List<User> userList = userRepository.findAllByEmailContaining(signInReq.getEmail()).get();
+                    for(User user : userList){
+                        if(passwordEncoder.matches(signInReq.getPassword(), user.getPassword()) &&
+                                user.getEmail().split("@")[0].equals(signInReq.getEmail())){
+                            final JwtService.TokenRes tokenRes =
+                                    new JwtService.TokenRes(jwtService.create(user.getId()));
+                            return DefaultRes.res(StatusCode.OK, "로그인 성공",tokenRes.getToken());
+                        }
+                    }
+                    return DefaultRes.res(StatusCode.NOT_FOUND, "로그인 실패 ");
+                }
+                else{
+                    return DefaultRes.res(StatusCode.NOT_FOUND, "로그인 실패 ");
+                }
             }
+
         } catch (Exception e) {
             System.out.println(e);
             return DefaultRes.res(StatusCode.DB_ERROR, ResponseMessage.DB_ERROR);
