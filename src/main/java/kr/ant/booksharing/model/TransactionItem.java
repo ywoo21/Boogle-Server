@@ -16,6 +16,8 @@ public class TransactionItem {
     private int transactionType;
     private String transPrice;
     private String itemImageUrl;
+    private String boxId;
+    private String boxPassword;
     private Date transactionCreatedTime;
     private List<Date> transactionProcessedTimeList;
     private int transactionStep;

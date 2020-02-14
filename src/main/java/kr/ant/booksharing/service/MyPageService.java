@@ -94,6 +94,8 @@ public class MyPageService {
                                     .transactionCreatedTime(buyerTransaction.getTransCreatedTime())
                                     .transactionProcessedTimeList(buyerTransaction.getTransactionTimeList())
                                     .transactionStep(buyerTransaction.getStep())
+                                    .boxId(buyerTransaction.getBoxId())
+                                    .boxPassword(buyerTransaction.getBoxPassword())
 
                                     .title(sellItemRepository.findBy_id(buyerTransaction.getSellItemId())
                                             .get().getTitle())
@@ -126,6 +128,8 @@ public class MyPageService {
                                     .transactionCreatedTime(sellerTransaction.getTransCreatedTime())
                                     .transactionProcessedTimeList(sellerTransaction.getTransactionTimeList())
                                     .transactionStep(sellerTransaction.getStep())
+                                    .boxId(sellerTransaction.getBoxId())
+                                    .boxPassword(sellerTransaction.getBoxPassword())
 
                                     .title(sellItemRepository.findBy_id(sellerTransaction.getSellItemId())
                                             .get().getTitle())
@@ -155,6 +159,8 @@ public class MyPageService {
                                     .transactionCreatedTime(null)
                                     .transactionProcessedTimeList(new ArrayList<>())
                                     .transactionStep(-1)
+                                    .boxId("")
+                                    .boxPassword("")
 
                                     .title(s.getTitle())
                                     .itemImageUrl(s.getImageUrl())
