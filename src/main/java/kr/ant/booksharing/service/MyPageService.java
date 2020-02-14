@@ -97,6 +97,7 @@ public class MyPageService {
 
                                     .title(sellItemRepository.findBy_id(buyerTransaction.getSellItemId())
                                             .get().getTitle())
+                                    .itemImageUrl(sellItemRepository.findBy_id(buyerTransaction.getSellItemId()).get().getImageUrl())
 
                                     .transPrice(sellItemRepository.findBy_id(buyerTransaction.getSellItemId())
                                             .get().getRegiPrice())
@@ -129,6 +130,8 @@ public class MyPageService {
                                     .title(sellItemRepository.findBy_id(sellerTransaction.getSellItemId())
                                             .get().getTitle())
 
+                                    .itemImageUrl(sellItemRepository.findBy_id(sellerTransaction.getSellItemId()).get().getImageUrl())
+
                                     .transPrice(sellItemRepository.findBy_id(sellerTransaction.getSellItemId())
                                             .get().getRegiPrice())
 
@@ -137,6 +140,32 @@ public class MyPageService {
                     sellTransList.add(transactionItem);
 
                 }
+            }
+
+            if(sellItemRepository.findAllBySellerId(userId).isPresent()){
+                List<SellItem> sellItemList = sellItemRepository.findAllBySellerId(userId).get();
+                sellItemList.stream().filter(s -> !s.isTraded()).forEach(s -> {
+                    TransactionItem transactionItem =
+
+                            TransactionItem.builder()
+                                    .sellItemId(s.get_id())
+                                    .traderName("")
+                                    .traderPhoneNumber("")
+                                    .transactionType(s.getDealType())
+                                    .transactionCreatedTime(null)
+                                    .transactionProcessedTimeList(new ArrayList<>())
+                                    .transactionStep(-1)
+
+                                    .title(s.getTitle())
+                                    .itemImageUrl(s.getImageUrl())
+
+                                    .transPrice(s.getRegiPrice())
+
+                                    .build();
+
+                    sellTransList.add(transactionItem);
+
+                });
             }
             myPageRes.setBuyTransList(buyTransList);
             myPageRes.setSellTransList(sellTransList);

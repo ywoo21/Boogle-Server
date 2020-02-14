@@ -22,6 +22,8 @@ public interface SellItemRepository extends MongoRepository<SellItem, String> {
 
     Optional<List<SellItem>> findTop4ByOrderByRegiTimeDesc();
     Optional<List<SellItem>> findTop4ByOrderByRegiPriceAsc();
+
+    Optional<List<SellItem>> findAllBySellerId(int sellerId);
 }
 
 
