@@ -59,5 +59,21 @@ public class UserBankAccountService {
             return DefaultRes.res(StatusCode.DB_ERROR, "전체 은행 정보 조회 실패");
         }
     }
+
+    /**
+     * 계좌 정보 저장
+     *
+     * @param userBankAccountId 계좌 정보 고유 번호
+     * @return DefaultRes
+     */
+    public DefaultRes deleteUserBankAccount(final String userBankAccountId) {
+        try {
+            userBankAccountRepository.deleteById(userBankAccountId);
+            return DefaultRes.res(StatusCode.OK, "계좌 정보 삭제 성공");
+        } catch (Exception e) {
+            System.out.println(e);
+            return DefaultRes.res(StatusCode.DB_ERROR, "계좌 정보 삭제 ");
+        }
+    }
 }
 

@@ -41,13 +41,14 @@ public class NaverBookApiController {
     }
 
     @GetMapping("naver/bookApi/buy")
-    public ResponseEntity getAllSearchedBuyItems(@RequestParam(value = "keyword", defaultValue = "") String keyword) {
+    public ResponseEntity getAllRegisteredBuyItems(@RequestParam(value = "keyword", defaultValue = "") String keyword) {
         try {
 
             List<String> itemIdList = new ArrayList<>();
             List<ItemRes> itemResList = new ArrayList<>();
 
             if (itemRepository.findAllByTitleContaining(keyword).isPresent()) {
+
                 List<Item> itemList = itemRepository.findAllByTitleContaining(keyword).get();
 
                 for (Item item : itemList) {
@@ -65,8 +66,8 @@ public class NaverBookApiController {
                     int minRegiPrice =
                             Integer.parseInt(sellItemList.get(0).getRegiPrice());
 
-                    for(SellItem temp : sellItemList){
-                        if(Integer.parseInt(temp.getRegiPrice()) < minRegiPrice){
+                    for (SellItem temp : sellItemList) {
+                        if (Integer.parseInt(temp.getRegiPrice()) < minRegiPrice) {
                             minRegiPrice = Integer.parseInt(temp.getRegiPrice());
                         }
                     }
@@ -95,6 +96,7 @@ public class NaverBookApiController {
             org.json.simple.JSONArray jsonArray = null;
 
             try {
+
                 Object obj = parser.parse(booksFromNaverBookApi);
 
                 obj = ((org.json.simple.JSONObject)obj).get("rss");
@@ -136,6 +138,7 @@ public class NaverBookApiController {
             } catch (ParseException e) {
 
             }
+
             return new ResponseEntity<>(itemResList, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
