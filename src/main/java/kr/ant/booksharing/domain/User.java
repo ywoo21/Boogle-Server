@@ -20,6 +20,6 @@ public class User {
     private String nickname;
     private String campus;
     private String semester;
-    private String major;
+    private String majorList;
     private String phoneNumber;
 }

@@ -12,9 +12,10 @@ public class MailContentBuilderService {
     @Autowired
     private TemplateEngine templateEngine;
 
-    public String buildEmailAuth(String message) {
+    public String buildEmailAuth(String userName, String code) {
         Context context = new Context();
-        context.setVariable("message", message);
+        context.setVariable("userName", userName);
+        context.setVariable("code", code);
         return templateEngine.process("email", context);
     }
 

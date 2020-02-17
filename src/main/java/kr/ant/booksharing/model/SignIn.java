@@ -1,12 +1,14 @@
 package kr.ant.booksharing.model;
 
 import kr.ant.booksharing.service.JwtService;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 
 public class SignIn {
+    @Builder
     @Getter
     @Setter
     @ToString
