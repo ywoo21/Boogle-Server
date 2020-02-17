@@ -1,5 +1,6 @@
 package kr.ant.booksharing.controller;
 
+import kr.ant.booksharing.domain.SellItem;
 import kr.ant.booksharing.model.Book.BookRes;
 import kr.ant.booksharing.model.DefaultRes;
 import kr.ant.booksharing.model.HomeRes;
@@ -26,15 +27,14 @@ public class HomeController {
     }
 
     /**
-     * 최근 등록 도서 목록 조회
+     * 홈 조회
      *
      * @return ResponseEntity
      */
     @GetMapping("")
-    public ResponseEntity getAllBooks() {
+    public ResponseEntity getHomeData() {
         try {
-            DefaultRes<HomeRes> homeRes = homeService.findRecentBook();
-            return new ResponseEntity<>(homeRes, HttpStatus.OK);
+            return new ResponseEntity<>(homeService.findAllHomeData(), HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);

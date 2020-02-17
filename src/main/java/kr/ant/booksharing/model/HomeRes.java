@@ -1,6 +1,6 @@
 package kr.ant.booksharing.model;
 
-import kr.ant.booksharing.model.Book.BookRes;
+import kr.ant.booksharing.domain.SellItem;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -11,7 +11,7 @@ import java.util.List;
 @Setter
 @ToString
 public class HomeRes {
-    private List<BookRes> bookResList1;
-    private List<BookRes> bookResList2;
-    private List<BookRes> bookResList3;
+    private List<SellItem> recentRegisteredSellItemList;
+    private List<SellItem> hotDealSellItemList;
+    private List<SellItem> popularSellItemList;
 }
