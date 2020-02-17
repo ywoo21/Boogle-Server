@@ -11,4 +11,5 @@ public interface TransactionRepository extends MongoRepository<Transaction, Stri
     Optional<List<Transaction>> findAllBySellerId(final int sellerId);
     Optional<List<Transaction>> findAllByBuyerId(final int buyerId);
     void deleteBySellItemId(final String sellItemId);
+    Optional<List<Transaction>> findAllByStepEquals(final int step);
 }
