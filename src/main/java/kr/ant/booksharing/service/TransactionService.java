@@ -137,7 +137,7 @@ public class TransactionService {
             return DefaultRes.res(StatusCode.OK, "거래 정보 목록 열람 성공", transactionRepository.findAll());
         } catch (Exception e){
             System.out.println(e);
-            return DefaultRes.res(StatusCode.NOT_FOUND, "거래 정보 목록 열람 성공");
+            return DefaultRes.res(StatusCode.NOT_FOUND, "거래 정보 목록 열람 실패");
         }
     }
 
@@ -156,6 +156,7 @@ public class TransactionService {
             currentTransactionTimeList.add(new Date());
 
             transaction.setTransactionTimeList(currentTransactionTimeList);
+            transactionRepository.save(transaction);
             return DefaultRes.res(StatusCode.CREATED, "거래 STEP 변경 성공");
         }
         catch(Exception e){

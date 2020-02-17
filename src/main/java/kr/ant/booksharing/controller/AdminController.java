@@ -5,10 +5,7 @@ import kr.ant.booksharing.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static kr.ant.booksharing.model.DefaultRes.FAIL_DEFAULT_RES;
 
@@ -91,7 +88,7 @@ public class AdminController {
      *
      * @return ResponseEntity
      */
-    @GetMapping("/step")
+    @GetMapping("/change_step")
     public ResponseEntity changeTransactionStep(@RequestParam("sellItemId")final String sellItemId) {
         try {
             return new ResponseEntity<>(transactionService.changeTransactionStep(sellItemId),HttpStatus.OK);
