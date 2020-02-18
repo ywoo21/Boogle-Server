@@ -45,18 +45,21 @@ public class MajorService {
      */
     public DefaultRes findAllMajorByCampusAndKeyword (final String campus, final String keyword) {
         try {
+
+            // 모든 DepartmentMajor(학부, 소속 학과 리스트) 리스트 반환
+
             List<DepartmentMajor> departmentMajorList =
                     majorRepository.findByCampus(campus).get().getDepartmentMajorList();
 
             List<DepartmentMajor> searchedDepartmentMajorList = new ArrayList<>();
+            List<String> searchedResultList = new ArrayList<>();
 
             for(int i = 0; i < departmentMajorList.size(); i++){
 
                 String department = departmentMajorList.get(i).getDepartment();
 
                 if(department.contains(keyword) || keyword.contains(department)){
-                    searchedDepartmentMajorList.add(departmentMajorList.get(i));
-                    continue;
+                    searchedResultList.add(departmentMajorList.get(i).getDepartment());
                 }
 
                 List<String> majorList = departmentMajorList.get(i).getMajorList();
@@ -65,14 +68,12 @@ public class MajorService {
                     String major = majorList.get(j);
 
                     if(major.contains(keyword) || keyword.contains(major)){
-                        searchedDepartmentMajorList.add(departmentMajorList.get(i));
-                        continue;
+                        searchedResultList.add(major);
                     }
                 }
-
             }
 
-            return DefaultRes.res(StatusCode.OK, "키워드를 포함하는 모든 전공 조회 성공", searchedDepartmentMajorList);
+            return DefaultRes.res(StatusCode.OK, "키워드를 포함하는 모든 전공 조회 성공", searchedResultList);
         } catch (Exception e) {
             System.out.println(e);
             return DefaultRes.res(StatusCode.DB_ERROR, "키워드를 포함하는 모든 전공 조회 실패");
