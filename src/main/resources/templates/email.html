@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>spring boot email test</title>
+</head>
+<body>
+<div style="width : 100%; height : 300px; margin : 5vh auto 30vh auto;">
+    <div style="width : 80%; height : 300px; margin : 10vh auto 20vh auto;
+border-top : 1px solid #292929; border-bottom : 1px solid #292929;">
+        <h1 style="text-align: center; color :#339eac; font-weight: bold; ">인증번호</h1>
+        <h2 th:text="${code}"  style="color : black; text-align: center; font-weight: bold;"></h2>
+        <h5 th:text="${userName + '님, 안녕하세요!'}" style="color : black; text-align: center; font-weight: bold; margin-top : 2vh;"></h5>
+        <h5 style="color : black; text-align: center; font-weight: bold;">북을 계정 본인 확인 메일입니다.</h5>
+        <h5 style="color : black; text-align: center; font-weight: bold;">인증번호를 입력하고, 본인 인증을 완료해주세요.</h5>
+    </div>
+</div>
+</body>
+</html>

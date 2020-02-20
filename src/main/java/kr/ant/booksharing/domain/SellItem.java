@@ -1,22 +1,34 @@
 package kr.ant.booksharing.domain;
 
 import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.util.Date;
+import java.util.List;
 
 @Data
-@Entity
-@Table(name = "sell_item")
+@Document("sell_item")
 public class SellItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private String _id;
 
-    private int itemId;
+    private String itemId;
+    private String title;
+    private String author;
+    private String publisher;
+    private String pubdate;
+    private String imageUrl;
+    private String price;
     private String regiPrice;
-    private int quality;
-    private String deal;
-    private Timestamp date;
-    private int state;
+    private List<String> regiImageUrlList;
+    private int dealType;
+    private List<Boolean> qualityIn;
+    private List<Boolean> qualityOut;
+    private int sellerId;
+    private Date regiTime;
+    private String comment;
+    private boolean isTraded;
 }

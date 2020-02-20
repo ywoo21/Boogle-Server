@@ -1,12 +1,16 @@
 package kr.ant.booksharing.controller;
 
-import kr.ant.booksharing.service.ListService;
+import kr.ant.booksharing.service.MyPageService;
+import kr.ant.booksharing.utils.auth.Auth;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.constraints.PastOrPresent;
+import javax.servlet.http.HttpServletRequest;
 
 import static kr.ant.booksharing.model.DefaultRes.FAIL_DEFAULT_RES;
 
@@ -14,74 +18,23 @@ import static kr.ant.booksharing.model.DefaultRes.FAIL_DEFAULT_RES;
 @RestController
 @RequestMapping("myPage")
 public class MyPageController {
+    private final MyPageService myPageService;
 
-    private final ListService listService;
-
-    public MyPageController(final ListService listService) {
-        this.listService = listService;
+    public MyPageController(final MyPageService myPageService) {
+        this.myPageService = myPageService;
     }
 
     /**
-     * 마이페이지 구매 목록 조회
+     * 마이페이지 조회
      *
-     * @param email 회원 이메일
      * @return ResponseEntity
      */
-    @GetMapping("buyList")
-    public ResponseEntity getBuyTransactinon(@RequestParam("email") String email) {
+    @Auth
+    @GetMapping("")
+    public ResponseEntity getMyPage(final HttpServletRequest httpServletRequest) {
         try {
-            return new ResponseEntity<>(listService.findBuyList(email), HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("{}", e);
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
-        }
-    }
-
-    /**
-     * 마이페이지 판매 목록 조회
-     *
-     * @param email 회원 이메일
-     * @return ResponseEntity
-     */
-    @GetMapping("sellList")
-    public ResponseEntity getSellTransactinon(@RequestParam("email") String email) {
-        try {
-            return new ResponseEntity<>(listService.findSellList(email), HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("{}", e);
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
-        }
-    }
-
-    /**
-     * 마이페이지 구매 상태 변경(state 1 -> state 2)
-     *
-     * @param email 유저 이메일
-     * @return ResponseEntity
-     */
-    @PostMapping("buyList/updateState")
-    public ResponseEntity updateBuyState
-    (@RequestParam("email") String email, @RequestParam("bookId") int bookId) {
-        try {
-            return new ResponseEntity<>(listService.updateBuyTransaction(email, bookId), HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("{}", e);
-            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
-        }
-    }
-
-    /**
-     * 마이페이지 등록된 판매 도서 삭제
-     *
-     * @param bookId 책 id
-     * @return ResponseEntity
-     */
-    @DeleteMapping("buyList")
-    public ResponseEntity deleteBook
-    (@RequestParam("bookId") int bookId) {
-        try {
-            listService.deleteBook(bookId);
-            return new ResponseEntity<>(HttpStatus.OK);
+            final int userIdx = (int) httpServletRequest.getAttribute("userIdx");
+            return new ResponseEntity<>(myPageService.findMyPage(userIdx) ,HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
