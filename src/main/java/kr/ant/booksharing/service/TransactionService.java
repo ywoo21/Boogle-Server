@@ -127,7 +127,7 @@ public class TransactionService {
     }
 
     /**
-     * 거래 정보 목록 열람
+     * 전체 거래 정보 목록 열람
      *
      * @param
      * @return DefaultRes
@@ -137,7 +137,7 @@ public class TransactionService {
             return DefaultRes.res(StatusCode.OK, "거래 정보 목록 열람 성공", transactionRepository.findAll());
         } catch (Exception e){
             System.out.println(e);
-            return DefaultRes.res(StatusCode.NOT_FOUND, "거래 정보 목록 열람 성공");
+            return DefaultRes.res(StatusCode.NOT_FOUND, "거래 정보 목록 열람 실패");
         }
     }
 
@@ -156,6 +156,7 @@ public class TransactionService {
             currentTransactionTimeList.add(new Date());
 
             transaction.setTransactionTimeList(currentTransactionTimeList);
+            transactionRepository.save(transaction);
             return DefaultRes.res(StatusCode.CREATED, "거래 STEP 변경 성공");
         }
         catch(Exception e){
@@ -197,6 +198,34 @@ public class TransactionService {
         catch(Exception e){
             System.out.println(e);
             return DefaultRes.res(StatusCode.DB_ERROR, "거래 취소 실패");
+        }
+    }
+
+    /**
+     * step2 거래 정보 목록 열람
+     *
+     *
+     */
+    public DefaultRes<List<Transaction>> findAllStepTwoTransaction(){
+        try{
+            return DefaultRes.res(StatusCode.OK, "step2 거래 정보 목록 열람 성공", transactionRepository.findAllByStepEquals(2).get());
+        } catch(Exception e) {
+            System.out.println(e);
+            return DefaultRes.res(StatusCode.NOT_FOUND, "step2 거래 정보 목록 열람 실패");
+        }
+    }
+
+    /**
+     * step5 거래 정보 목록 열람
+     *
+     *
+     */
+    public DefaultRes<List<Transaction>> findAllStepFiveTransaction(){
+        try{
+            return DefaultRes.res(StatusCode.OK, "step5 거래 정보 목록 열람 성공", transactionRepository.findAllByStepEquals(5).get());
+        } catch(Exception e) {
+            System.out.println(e);
+            return DefaultRes.res(StatusCode.NOT_FOUND, "step5 거래 정보 목록 열람 실패");
         }
     }
 }
