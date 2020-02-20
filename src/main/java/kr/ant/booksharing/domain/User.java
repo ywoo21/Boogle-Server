@@ -22,4 +22,5 @@ public class User {
     private String semester;
     private String majorList;
     private String phoneNumber;
+    private boolean isAuthComplete;
 }

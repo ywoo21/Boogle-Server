@@ -6,6 +6,5 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Data
 public class UserCampusAuthImageReq {
-    private UserCampusAuthImage userCampusAuthImage;
     private MultipartFile userCampusAuthImageFile;
 }

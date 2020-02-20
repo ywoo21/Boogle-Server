@@ -330,7 +330,12 @@ public class UserService {
      */
     public DefaultRes findAllUsers() {
         try {
-            return DefaultRes.res(StatusCode.OK, "회원 정보 목록 열람 성공", userRepository.findAll());
+
+            List<User> userList = userRepository.findAll();
+            userList.stream().forEach(u -> u.setPassword(""));
+
+            return DefaultRes.res(StatusCode.OK, "회원 정보 목록 열람 성공", userList);
+
         } catch (Exception e) {
             System.out.println(e);
             return DefaultRes.res(StatusCode.NOT_FOUND, "회원 정보 목록 열람 실패");
