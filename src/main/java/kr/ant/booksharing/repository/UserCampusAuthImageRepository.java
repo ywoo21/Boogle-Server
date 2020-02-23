@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface UserCampusAuthImageRepository extends MongoRepository<UserCampusAuthImage, String> {
     Optional<UserCampusAuthImage> findByUserId(int userId);
+    void deleteByUserId(int userId);
 }

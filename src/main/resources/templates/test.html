@@ -4,16 +4,123 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>spring boot email test</title>
+    <style type="text/css">
+        .logo{
+            position: relative;
+            top: 28px;
+            left: 28px;
+        }
+        .inbox{
+            position: relative;
+            margin: 40px 18px 18px 18px;
+            padding: 30px 0px;
+            border: solid 1px #666666;
+            border-left: none;
+            border-right: none;
+            opacity: 0.8;
+        }
+        .description {
+            text-align: center;
+            font-family: 'Noto Sans KR', 'helvetica', sans-serif;
+            font-size: 15px;
+            font-weight: normal;
+            line-height: 1.67;
+            letter-spacing: normal;
+            color: #292929;
+        }
+        .content{
+            width: 90%;
+            margin: 27px auto;
+            padding-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.16);
+            background-color: #F2F2F2;
+            display: flex;
+            justify-content: center;
+        }
+        .bookimg{
+            width: 96px;
+            height: 143px;
+            margin: 27px;
+            border-radius: 5px;
+            flex: 1;
+        }
+        .book_content{
+            flex: 3;
+            margin: 27px 0px;
+        }
+        .book_title{
+            font-family: 'Noto Sans KR', 'helvetica', sans-serif;
+            font-size: 20px;
+            font-weight: 500;
+            line-height: 1.25;
+            text-align: left;
+            color: #292929;
+            margin-top: 0px;
+        }
+        .trans_content{
+            font-family: 'Noto Sans KR', 'helvetica', sans-serif;
+            font-size: 14px;
+            font-weight: 300;
+            line-height: 1.21;
+            text-align: left;
+            color: #656565;
+        }
+        .seller_name{
+            font-family: 'Noto Sans KR', 'helvetica', sans-serif;
+            font-size: 16px;
+            font-weight: normal;
+            line-height: 4;
+            text-align: left;
+            color: #292929;
+        }
+        .transaction_history{
+            font-family: 'Noto Sans KR', 'helvetica', sans-serif;
+            font-size: 18px;
+            font-weight: 500;
+            line-height: 1.33;
+            text-align: center;
+            color: #707070;
+            position: absolute;
+            right: 60px;
+        }
+        .button_styled {
+            display: flex;
+            justify-content: center;
+            margin: 0 auto;
+            border: 0;
+            line-height: 2.5;
+            padding: 0 20px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: center;
+            color: #fff;
+            border-radius: 10px;
+            width:153px;
+            height:39px;
+            background-color:#339eac;
+            box-shadow: 9px 9px 16px rgba(163,177,198,0.6), -9px -9px 16px    rgba(255,255,255, 0.5);
+        }
+    </style>
 </head>
 <body>
-<div style="width : 100%; height : 300px; margin : 5vh auto 30vh auto;">
-    <div style="width : 80%; height : 300px; margin : 10vh auto 20vh auto;
-border-top : 1px solid #292929; border-bottom : 1px solid #292929;">
-        <h1 style="text-align: center; color :#339eac; font-weight: bold; ">인증번호</h1>
-        <h2 style="color : black; text-align: center; font-weight: bold;">1234</h2>
-        <h5 style="color : black; text-align: center; font-weight: bold; margin-top : 2vh;">박영우님, 안녕하세요</h5>
-        <h5 style="color : black; text-align: center; font-weight: bold;">북을 계정 본인 확인 메일입니다.</h5>
-        <h5 style="color : black; text-align: center; font-weight: bold;">인증번호를 입력하고, 본인 인증을 완료해주세요.</h5>
+<div style="width : 100%; height : 100%; margin : 10vh auto 0vh auto; border : 1px solid #339EAC;">
+    <img src="boogle_square.png" width="100%" height="85.8px">
+    <img class="logo" src="boogle.png" width="46.1px">
+    <div class="inbox">
+        <p class="description">정의현 님, 안녕하세요! <br>북을박스에 구매하신 도서가 비치되었습니다.<br>구매 정보를 확인하시고<br>북을 박스에서 도서를 수령해주세요.</p>
+        <div class="content">
+            <img class="bookimg" src="https://image.aladin.co.kr/product/5214/82/cover500/8962183676_1.jpg">
+            <div class="book_content">
+                <h1 class="book_title"> 맨큐의 경제학 (7판)</h1>
+                <h3 class="trans_content">주문일자: 2020.01.03 | 금액: 8000원 </h3>
+                <h2 class="seller_name">판매자: 홍길동 </h2>
+                <a href="#" target="_blank" class="transaction_history">거래내역 더보기</a>
+            </div>
+        </div>
+        <input class="button_styled"
+               type="button"
+               value="수령하기">
     </div>
 </div>
 </body>

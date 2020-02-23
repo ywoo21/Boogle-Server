@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 @Service
 public class MailContentBuilderService {
     @Autowired
@@ -19,11 +22,16 @@ public class MailContentBuilderService {
         return templateEngine.process("email", context);
     }
 
-    public String buildTransRequest(SellItem sellItem) {
+    public String buildTransRequest(SellItem sellItem, String userName, String buyerName) {
         Context context = new Context();
+        context.setVariable("userName", userName);
+        context.setVariable("buyerName", buyerName);
         context.setVariable("title", sellItem.getTitle());
+        context.setVariable("imageUrl", sellItem.getImageUrl());
         context.setVariable("regiPrice", sellItem.getRegiPrice());
-        context.setVariable("regiTime", sellItem.getRegiTime().toString());
+        SimpleDateFormat format = new SimpleDateFormat ( "yyyy.MM.dd");
+        Date regiTime = sellItem.getRegiTime();
+        context.setVariable("regiTime", format.format(regiTime));
         context.setVariable("sellerId", sellItem.getSellerId());
         return templateEngine.process("transRequest", context);
     }

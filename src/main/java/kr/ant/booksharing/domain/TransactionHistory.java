@@ -32,4 +32,6 @@ public class TransactionHistory {
 
     private String boxId;
     private String boxPassword;
+
+    private boolean isPaymentDone;
 }
