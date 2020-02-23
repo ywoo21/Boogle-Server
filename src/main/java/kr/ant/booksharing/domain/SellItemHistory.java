@@ -25,6 +25,7 @@ public class SellItemHistory {
     private String imageUrl;
     private String price;
     private String regiPrice;
+    private String originalPrice;
     private List<String> regiImageUrlList;
     private int dealType;
     private List<Boolean> qualityIn;

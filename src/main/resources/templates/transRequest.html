@@ -123,7 +123,7 @@
         <p class="description">회원님께서 업로드 하신 도서에 대한
             <br>구매 요청이 확인되었습니다.<br>판매 정보를 확인하시고 구매 요청을 수락해주세요.
         <div class="content">
-            <img class="bookimg" src="https://image.aladin.co.kr/product/5214/82/cover500/8962183676_1.jpg">
+            <img class="bookimg" th:src="${imageUrl}">
             <div class="book_content">
                 <h1 th:text="${title}" class="book_title" ></h1>
                 <h3 th:text="${'주문일자 : ' + regiTime + ' | 금액 : ' + regiPrice + '원'}" class="trans_content"></h3>

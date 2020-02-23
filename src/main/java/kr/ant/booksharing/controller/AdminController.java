@@ -62,7 +62,7 @@ public class AdminController {
      *
      * @return ResponseEntity
      */
-    @GetMapping("/transactions/step_two")
+    @GetMapping("/transactions/stepTwo")
     public ResponseEntity getAllStepTwoTransaction(){
         try {
             return new ResponseEntity<>(transactionService.findAllStepTwoTransaction(), HttpStatus.OK);
@@ -73,14 +73,14 @@ public class AdminController {
     }
 
     /**
-     * step5 거래 정보 목록 열람
+     * step4 거래 정보 목록 열람
      *
      * @return ResponseEntity
      */
-    @GetMapping("/transactions/step_five")
-    public ResponseEntity getAllStepFiveTransaction(){
+    @GetMapping("/transactions/stepFour")
+    public ResponseEntity getAllStepFourTransaction(){
         try {
-            return new ResponseEntity<>(transactionService.findAllStepFiveTransaction(), HttpStatus.OK);
+            return new ResponseEntity<>(transactionService.findAllStepFourTransaction(), HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
