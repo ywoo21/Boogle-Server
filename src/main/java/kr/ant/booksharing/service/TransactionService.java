@@ -1,14 +1,12 @@
 package kr.ant.booksharing.service;
 
+import kr.ant.booksharing.domain.BoogleBox;
 import kr.ant.booksharing.domain.SellItem;
 import kr.ant.booksharing.domain.Transaction;
 import kr.ant.booksharing.domain.TransactionHistory;
 import kr.ant.booksharing.model.BoogleBoxInfo;
 import kr.ant.booksharing.model.DefaultRes;
-import kr.ant.booksharing.repository.SellItemRepository;
-import kr.ant.booksharing.repository.TransactionHistoryRepository;
-import kr.ant.booksharing.repository.TransactionRepository;
-import kr.ant.booksharing.repository.UserRepository;
+import kr.ant.booksharing.repository.*;
 import kr.ant.booksharing.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -30,6 +28,7 @@ public class TransactionService {
     private final MailContentBuilderService mailContentBuilderService;
     private final JavaMailSender javaMailSender;
     private final UserRepository userRepository;
+    private final BoogleBoxRepository boogleBoxRepository;
 
     public TransactionService(final TransactionRepository transactionRepository,
                               final TransactionHistoryRepository transactionHistoryRepository,
@@ -37,7 +36,8 @@ public class TransactionService {
                               final MailSenderService mailSenderService,
                               final MailContentBuilderService mailContentBuilderService,
                               final JavaMailSender javaMailSender,
-                              final UserRepository userRepository) {
+                              final UserRepository userRepository,
+                              final BoogleBoxRepository boogleBoxRepository) {
         this.transactionRepository = transactionRepository;
         this.transactionHistoryRepository = transactionHistoryRepository;
         this.sellItemRepository = sellItemRepository;
@@ -45,6 +45,7 @@ public class TransactionService {
         this.mailContentBuilderService = mailContentBuilderService;
         this.javaMailSender = javaMailSender;
         this.userRepository = userRepository;
+        this.boogleBoxRepository = boogleBoxRepository;
     }
 
     /**
@@ -184,6 +185,18 @@ public class TransactionService {
             if(transaction.isPaymentDone()){
                 changeTransactionStep(boogleBoxInfo.getSellItemId());
             }
+
+            //boogleBox db에 저장
+            BoogleBox boogleBox = new BoogleBox();
+            boogleBox.set_id(boogleBoxInfo.getId());
+            boogleBox.setBoxPassword(boogleBoxInfo.getPassword());
+            boogleBox.setSellItemId(boogleBoxInfo.getSellItemId());
+            boogleBox.setSellerId(transaction.getSellerId());
+            boogleBox.setBuyerId(transaction.getBuyerId());
+            boogleBox.setRegisterTime(new Date());
+            boogleBox.setEmpty(false);
+
+            boogleBoxRepository.save(boogleBox);
 
             return DefaultRes.res(StatusCode.CREATED, "북을 박스 정보 저장");
         }
