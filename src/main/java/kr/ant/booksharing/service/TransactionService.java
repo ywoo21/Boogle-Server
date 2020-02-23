@@ -1,14 +1,12 @@
 package kr.ant.booksharing.service;
 
+import kr.ant.booksharing.domain.BoogleBox;
 import kr.ant.booksharing.domain.SellItem;
 import kr.ant.booksharing.domain.Transaction;
 import kr.ant.booksharing.domain.TransactionHistory;
 import kr.ant.booksharing.model.BoogleBoxInfo;
 import kr.ant.booksharing.model.DefaultRes;
-import kr.ant.booksharing.repository.SellItemRepository;
-import kr.ant.booksharing.repository.TransactionHistoryRepository;
-import kr.ant.booksharing.repository.TransactionRepository;
-import kr.ant.booksharing.repository.UserRepository;
+import kr.ant.booksharing.repository.*;
 import kr.ant.booksharing.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -30,6 +28,7 @@ public class TransactionService {
     private final MailContentBuilderService mailContentBuilderService;
     private final JavaMailSender javaMailSender;
     private final UserRepository userRepository;
+    private final BoogleBoxRepository boogleBoxRepository;
 
     public TransactionService(final TransactionRepository transactionRepository,
                               final TransactionHistoryRepository transactionHistoryRepository,
@@ -37,7 +36,8 @@ public class TransactionService {
                               final MailSenderService mailSenderService,
                               final MailContentBuilderService mailContentBuilderService,
                               final JavaMailSender javaMailSender,
-                              final UserRepository userRepository) {
+                              final UserRepository userRepository,
+                              final BoogleBoxRepository boogleBoxRepository) {
         this.transactionRepository = transactionRepository;
         this.transactionHistoryRepository = transactionHistoryRepository;
         this.sellItemRepository = sellItemRepository;
@@ -45,6 +45,7 @@ public class TransactionService {
         this.mailContentBuilderService = mailContentBuilderService;
         this.javaMailSender = javaMailSender;
         this.userRepository = userRepository;
+        this.boogleBoxRepository = boogleBoxRepository;
     }
 
     /**
@@ -185,6 +186,18 @@ public class TransactionService {
                 changeTransactionStep(boogleBoxInfo.getSellItemId());
             }
 
+            //boogleBox db에 저장
+            BoogleBox boogleBox = new BoogleBox();
+            boogleBox.set_id(boogleBoxInfo.getId());
+            boogleBox.setBoxPassword(boogleBoxInfo.getPassword());
+            boogleBox.setSellItemId(boogleBoxInfo.getSellItemId());
+            boogleBox.setSellerId(transaction.getSellerId());
+            boogleBox.setBuyerId(transaction.getBuyerId());
+            boogleBox.setRegisterTime(new Date());
+            boogleBox.setEmpty(false);
+
+            boogleBoxRepository.save(boogleBox);
+
             return DefaultRes.res(StatusCode.CREATED, "북을 박스 정보 저장");
         }
         catch(Exception e){
@@ -255,16 +268,16 @@ public class TransactionService {
     }
 
     /**
-     * step5 거래 정보 목록 열람
+     * step4 거래 정보 목록 열람
      *
      *
      */
     public DefaultRes<List<Transaction>> findAllStepFiveTransaction(){
         try{
-            return DefaultRes.res(StatusCode.OK, "step5 거래 정보 목록 열람 성공", transactionRepository.findAllByStepEquals(5).get());
+            return DefaultRes.res(StatusCode.OK, "step4 거래 정보 목록 열람 성공", transactionRepository.findAllByStepEquals(4).get());
         } catch(Exception e) {
             System.out.println(e);
-            return DefaultRes.res(StatusCode.NOT_FOUND, "step5 거래 정보 목록 열람 실패");
+            return DefaultRes.res(StatusCode.NOT_FOUND, "step4 거래 정보 목록 열람 실패");
         }
     }
 }
