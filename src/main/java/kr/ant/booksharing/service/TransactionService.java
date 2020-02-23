@@ -247,7 +247,8 @@ public class TransactionService {
      */
     public DefaultRes<List<Transaction>> findAllStepTwoTransaction(){
         try{
-            return DefaultRes.res(StatusCode.OK, "step2 거래 정보 목록 열람 성공", transactionRepository.findAllByStepEquals(2).get());
+            return DefaultRes.res(StatusCode.OK, "step2 거래 정보 목록 열람 성공",
+                    transactionRepository.findAllByStepEquals(2).get());
         } catch(Exception e) {
             System.out.println(e);
             return DefaultRes.res(StatusCode.NOT_FOUND, "step2 거래 정보 목록 열람 실패");
@@ -255,16 +256,17 @@ public class TransactionService {
     }
 
     /**
-     * step5 거래 정보 목록 열람
+     * step4 거래 정보 목록 열람
      *
      *
      */
-    public DefaultRes<List<Transaction>> findAllStepFiveTransaction(){
+    public DefaultRes<List<Transaction>> findAllStepFourTransaction(){
         try{
-            return DefaultRes.res(StatusCode.OK, "step5 거래 정보 목록 열람 성공", transactionRepository.findAllByStepEquals(5).get());
+            return DefaultRes.res(StatusCode.OK, "step4 거래 정보 목록 열람 성공",
+                    transactionRepository.findAllByStepEquals(4).get());
         } catch(Exception e) {
             System.out.println(e);
-            return DefaultRes.res(StatusCode.NOT_FOUND, "step5 거래 정보 목록 열람 실패");
+            return DefaultRes.res(StatusCode.NOT_FOUND, "step4 거래 정보 목록 열람 실패");
         }
     }
 }

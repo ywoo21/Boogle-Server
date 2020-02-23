@@ -6,7 +6,6 @@ import kr.ant.booksharing.domain.SellItemHistory;
 import kr.ant.booksharing.domain.User;
 import kr.ant.booksharing.model.*;
 import kr.ant.booksharing.repository.*;
-import kr.ant.booksharing.utils.ResponseMessage;
 import kr.ant.booksharing.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,6 @@ public class SellItemService {
 
     private final SellItemRepository sellItemRepository;
     private final SellItemHistoryRepository sellItemHistoryRepository;
-    private final RegiImageRepository regiImageRepository;
     private final S3FileUploadService s3FileUploadService;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
@@ -40,7 +38,6 @@ public class SellItemService {
         this.sellItemRepository = sellItemRepository;
         this.sellItemHistoryRepository = sellItemHistoryRepository;
         this.s3FileUploadService = s3FileUploadService;
-        this.regiImageRepository = regiImageRepository;
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
         this.userBookmarkRepository = userBookmarkRepository;
@@ -120,6 +117,15 @@ public class SellItemService {
 
             sellItem.setRegiImageUrlList(regiImageUrlList);
 
+            int originalPrice = Integer.parseInt(sellItem.getOriginalPrice());
+
+            if(sellItem.getDealType() == 0){
+                sellItem.setRegiPrice(sellItem.getOriginalPrice());
+            }
+            else{
+                sellItem.setRegiPrice(Integer.toString(originalPrice + 500));
+            }
+
             Item item = new Item();
             if(itemRepository.findByItemId(sellItem.getItemId()).isPresent()){
 
@@ -162,6 +168,7 @@ public class SellItemService {
                         .regiTime(sellItem.getRegiTime())
                         .sellerId(sellItem.getSellerId())
                         .regiPrice(sellItem.getRegiPrice())
+                        .originalPrice(sellItem.getOriginalPrice())
                         .build();
 
             sellItemHistoryRepository.save(sellItemHistory);
