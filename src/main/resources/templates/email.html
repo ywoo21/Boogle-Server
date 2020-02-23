@@ -4,16 +4,136 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>spring boot email test</title>
+    <style type="text/css">
+        .logo{
+            position: relative;
+            top: 28px;
+            left: 28px;
+        }
+        .inbox{
+            position: relative;
+            margin: 40px 18px 18px 18px;
+            padding: 30px 0px;
+            border: solid 1px #666666;
+            border-left: none;
+            border-right: none;
+            opacity: 0.8;
+        }
+
+        .title{
+            text-align: center;
+            font-family: 'Noto Sans KR', 'helvetica', sans-serif;
+            font-size: 25px;
+            font-weight: normal;
+            line-height: 1.67;
+            letter-spacing: normal;
+            color: #292929;
+            font-weight: 600;
+            margin : 0px;
+        }
+        .description-title {
+            text-align: center;
+            font-family: 'Noto Sans KR', 'helvetica', sans-serif;
+            font-size: 15px;
+            font-weight: normal;
+            line-height: 1.67;
+            letter-spacing: normal;
+            color: #292929;
+            margin : 20px 0px 0px 0px;
+        }
+        .description {
+            text-align: center;
+            font-family: 'Noto Sans KR', 'helvetica', sans-serif;
+            font-size: 15px;
+            font-weight: normal;
+            line-height: 1.67;
+            letter-spacing: normal;
+            color: #292929;
+        }
+        .content{
+            width: 90%;
+            margin: 27px auto;
+            padding-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.16);
+            background-color: #F2F2F2;
+            display: flex;
+            justify-content: center;
+        }
+        .bookimg{
+            width: 96px;
+            height: 143px;
+            margin: 27px;
+            border-radius: 5px;
+            flex: 1;
+        }
+        .book_content{
+            flex: 3;
+            margin: 27px 0px;
+        }
+        .book_title{
+            font-family: 'Noto Sans KR', 'helvetica', sans-serif;
+            font-size: 20px;
+            font-weight: 500;
+            line-height: 1.25;
+            text-align: left;
+            color: #292929;
+            margin-top: 0px;
+        }
+        .trans_content{
+            font-family: 'Noto Sans KR', 'helvetica', sans-serif;
+            font-size: 14px;
+            font-weight: 300;
+            line-height: 1.21;
+            text-align: left;
+            color: #656565;
+        }
+        .seller_name{
+            font-family: 'Noto Sans KR', 'helvetica', sans-serif;
+            font-size: 16px;
+            font-weight: normal;
+            line-height: 4;
+            text-align: left;
+            color: #292929;
+        }
+        .transaction_history{
+            font-family: 'Noto Sans KR', 'helvetica', sans-serif;
+            font-size: 18px;
+            font-weight: 500;
+            line-height: 1.33;
+            text-align: center;
+            color: #707070;
+            position: absolute;
+            right: 60px;
+        }
+        .button_styled {
+            display: flex;
+            justify-content: center;
+            margin: 0 auto;
+            border: 0;
+            line-height: 2.5;
+            padding: 0 20px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: center;
+            color: #fff;
+            border-radius: 10px;
+            width:153px;
+            height:39px;
+            background-color:#339eac;
+            box-shadow: 9px 9px 16px rgba(163,177,198,0.6), -9px -9px 16px    rgba(255,255,255, 0.5);
+        }
+    </style>
 </head>
 <body>
-<div style="width : 100%; height : 300px; margin : 5vh auto 30vh auto;">
-    <div style="width : 80%; height : 300px; margin : 10vh auto 20vh auto;
-border-top : 1px solid #292929; border-bottom : 1px solid #292929;">
-        <h1 style="text-align: center; color :#339eac; font-weight: bold; ">인증번호</h1>
-        <h2 th:text="${code}"  style="color : black; text-align: center; font-weight: bold;"></h2>
-        <h5 th:text="${userName + '님, 안녕하세요!'}" style="color : black; text-align: center; font-weight: bold; margin-top : 2vh;"></h5>
-        <h5 style="color : black; text-align: center; font-weight: bold;">북을 계정 본인 확인 메일입니다.</h5>
-        <h5 style="color : black; text-align: center; font-weight: bold;">인증번호를 입력하고, 본인 인증을 완료해주세요.</h5>
+<div style="width : 50%; height : 100%; margin : 10vh auto 0vh auto; border : 1px solid #339EAC;">
+    <img src="https://project-youngwoo.s3.ap-northeast-2.amazonaws.com/email_top.png" width="100%" height="85.8px">
+    <img class="logo" src="https://project-youngwoo.s3.ap-northeast-2.amazonaws.com/logo_gray.png" width="46.1px">
+    <div class="inbox">
+        <h5 th:text="${'인증번호'}" class="title"></h5>
+        <h5 th:text="${code}" class="title"></h5>
+        <p class="description-title" th:text="${userName + ' 님, 안녕하세요!'}"></p>
+        <p class="description">북을 계정 본인 확인 메일입니다.<br>인증번호를 입력하고, 본인 인증을 완료해주세요.</p>
     </div>
 </div>
 </body>

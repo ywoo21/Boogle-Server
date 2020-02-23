@@ -91,8 +91,12 @@ public class UserCampusAuthImageService {
             User user = userRepository.findById(userId).get();
 
             if(!user.isAuthComplete()) {
+
                 user.setAuthComplete(true);
                 userRepository.save(user);
+
+                userCampusAuthImageRepository.deleteByUserId(userId);
+
             }
 
             return DefaultRes.res(StatusCode.OK, "학생 인증 상태 변경 성공");
