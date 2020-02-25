@@ -1,5 +1,6 @@
 package kr.ant.booksharing.controller;
 
+import kr.ant.booksharing.service.BoogleBoxService;
 import kr.ant.booksharing.service.TransactionService;
 import kr.ant.booksharing.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -15,11 +16,14 @@ import static kr.ant.booksharing.model.DefaultRes.FAIL_DEFAULT_RES;
 public class AdminController {
     private final UserService userService;
     private final TransactionService transactionService;
+    private final BoogleBoxService boogleBoxService;
 
     public AdminController(final UserService userService,
-                           final TransactionService transactionService) {
+                           final TransactionService transactionService,
+                           final BoogleBoxService boogleBoxService) {
         this.userService = userService;
         this.transactionService = transactionService;
+        this.boogleBoxService = boogleBoxService;
     }
 
     /**
@@ -95,6 +99,21 @@ public class AdminController {
         } catch (Exception e) {
             log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
+     * 북을박스 전체 정보 조회
+     *
+     * @return ResponseEntity
+     */
+    @GetMapping("/booglebox")
+    public ResponseEntity getAllBoogleBox(){
+        try{
+            return new ResponseEntity<>(boogleBoxService.findAllBoogleBoxes(), HttpStatus.OK);
+        } catch (Exception e){
+            log.error("{}", e);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 }
