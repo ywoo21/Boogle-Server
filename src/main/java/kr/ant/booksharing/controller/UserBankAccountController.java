@@ -65,7 +65,7 @@ public class UserBankAccountController {
     }
 
     /**
-     * 계좌 정보 조회
+     * 계좌 정보 삭제
      *
      * @param userBankAccountId 계좌 정보 고유 번호
      * @return ResponseEntity
@@ -76,6 +76,24 @@ public class UserBankAccountController {
         try {
             return new ResponseEntity<>
                     (userBankAccountService.deleteUserBankAccount(userBankAccountId), HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("{}", e);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
+     * 계좌 정보 조회
+     *
+     * @return ResponseEntity
+     */
+    @Auth
+    @GetMapping("/sell")
+    public ResponseEntity getAllBankInfoIncludingBankName(final HttpServletRequest httpServletRequest) {
+        try {
+            final int userIdx = (int) httpServletRequest.getAttribute("userIdx");
+            return new ResponseEntity<>
+                    (userBankAccountService.findAllUserBankAccountIncludingBankNameByUserId(userIdx), HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
