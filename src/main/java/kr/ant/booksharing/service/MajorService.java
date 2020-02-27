@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class MajorService {
@@ -72,6 +73,10 @@ public class MajorService {
                     }
                 }
             }
+
+            // Stream 을 이용한 중복 제거
+            searchedResultList = searchedResultList.parallelStream().distinct().collect(Collectors.toList());
+
 
             return DefaultRes.res(StatusCode.OK, "키워드를 포함하는 모든 전공 조회 성공", searchedResultList);
         } catch (Exception e) {
