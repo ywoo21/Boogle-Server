@@ -52,6 +52,9 @@ public class NaverBookApiController {
                 List<Item> itemList = itemRepository.findAllByTitleContaining(keyword).get();
 
                 for (Item item : itemList) {
+
+                    if(item.getRegiCount() < 1) continue;
+
                     ItemRes itemRes = new ItemRes();
 
                     List<SellItem> sellItemList =
@@ -158,6 +161,9 @@ public class NaverBookApiController {
                 List<Item> itemList = itemRepository.findAllByTitleContaining(keyword).get();
 
                 for (Item item : itemList) {
+
+                    if(item.getRegiCount() < 1) continue;
+
                     ItemRes itemRes = new ItemRes();
 
                     List<SellItem> sellItemList =

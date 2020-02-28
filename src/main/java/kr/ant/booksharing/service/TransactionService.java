@@ -1,9 +1,6 @@
 package kr.ant.booksharing.service;
 
-import kr.ant.booksharing.domain.BoogleBox;
-import kr.ant.booksharing.domain.SellItem;
-import kr.ant.booksharing.domain.Transaction;
-import kr.ant.booksharing.domain.TransactionHistory;
+import kr.ant.booksharing.domain.*;
 import kr.ant.booksharing.model.BoogleBoxInfo;
 import kr.ant.booksharing.model.DefaultRes;
 import kr.ant.booksharing.repository.*;
@@ -24,6 +21,7 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final TransactionHistoryRepository transactionHistoryRepository;
     private final SellItemRepository sellItemRepository;
+    private final ItemRepository itemRepository;
     private final MailSenderService mailSenderService;
     private final MailContentBuilderService mailContentBuilderService;
     private final JavaMailSender javaMailSender;
@@ -33,6 +31,7 @@ public class TransactionService {
     public TransactionService(final TransactionRepository transactionRepository,
                               final TransactionHistoryRepository transactionHistoryRepository,
                               final SellItemRepository sellItemRepository,
+                              final ItemRepository itemRepository,
                               final MailSenderService mailSenderService,
                               final MailContentBuilderService mailContentBuilderService,
                               final JavaMailSender javaMailSender,
@@ -41,6 +40,7 @@ public class TransactionService {
         this.transactionRepository = transactionRepository;
         this.transactionHistoryRepository = transactionHistoryRepository;
         this.sellItemRepository = sellItemRepository;
+        this.itemRepository = itemRepository;
         this.mailSenderService = mailSenderService;
         this.mailContentBuilderService = mailContentBuilderService;
         this.javaMailSender = javaMailSender;
@@ -63,6 +63,13 @@ public class TransactionService {
             sellItemRepository.save(sellItem);
 
             if(!transactionRepository.findBySellItemId(transaction.getSellItemId()).isPresent()){
+
+                Item item = itemRepository.findByItemId(sellItem.getItemId()).get();
+
+                int currRegiCount = item.getRegiCount();
+                item.setRegiCount(currRegiCount - 1);
+
+                itemRepository.save(item);
 
                 transaction.setTransCreatedTime(new Date());
 
@@ -111,10 +118,10 @@ public class TransactionService {
 
             transactionHistoryRepository.save(transactionHistory);
 
-            String buyerName = userRepository.findById(transaction.getBuyerId()).get().getName();
+            String buyerNickname = userRepository.findById(transaction.getBuyerId()).get().getNickname();
             String userName = userRepository.findById(transaction.getSellerId()).get().getName();
 
-            String content = mailContentBuilderService.buildTransRequest(sellItem, userName, buyerName);
+            String content = mailContentBuilderService.buildTransRequest(sellItem, userName, buyerNickname);
             MimeMessagePreparator mimeMessagePreparator =
                     mailSenderService.createMimeMessage(userRepository.findById(sellItem.getSellerId()).get().getEmail(),
                     "구매 요청", content);

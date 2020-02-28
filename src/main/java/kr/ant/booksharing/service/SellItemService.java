@@ -8,6 +8,7 @@ import kr.ant.booksharing.model.*;
 import kr.ant.booksharing.repository.*;
 import kr.ant.booksharing.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -52,9 +53,9 @@ public class SellItemService {
      */
     public DefaultRes<List<SellItem>> findAllSellItems(final String itemId) {
 
-        if(sellItemRepository.findAllByItemId(itemId).isPresent()){
+        if(sellItemRepository.findAllByItemIdAndIsTraded(itemId,false).isPresent()){
 
-            List<SellItem> sellItemList = sellItemRepository.findAllByItemId(itemId).get();
+            List<SellItem> sellItemList = sellItemRepository.findAllByItemIdAndIsTraded(itemId, false).get();
 
             return DefaultRes.res(StatusCode.OK, "판매 상품 조회 성공", sellItemList);
 
@@ -147,6 +148,7 @@ public class SellItemService {
                 itemRepository.save(item);
             }
 
+
             String id = sellItemRepository.save(sellItem).get_id();
 
             SellItemHistory sellItemHistory =
@@ -161,8 +163,8 @@ public class SellItemService {
                         .price(sellItem.getPrice())
                         .pubdate(sellItem.getPubdate())
                         .publisher(sellItem.getPublisher())
-                        .qualityIn(sellItem.getQualityIn())
-                        .qualityOut(sellItem.getQualityOut())
+                        .qualityGeneral(sellItem.getQualityGeneral())
+                        .qualityExtraList(sellItem.getQualityExtraList())
                         .regiImageUrlList(sellItem.getRegiImageUrlList())
                         .title(sellItem.getTitle())
                         .regiTime(sellItem.getRegiTime())
