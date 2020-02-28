@@ -1,7 +1,13 @@
 package kr.ant.booksharing.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import kr.ant.booksharing.enums.QualityGeneral;
 import lombok.Builder;
 import lombok.Data;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -15,6 +21,7 @@ import java.util.List;
 @Document("sell_item_history")
 public class SellItemHistory {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String _id;
 
     private String itemId;
@@ -28,10 +35,13 @@ public class SellItemHistory {
     private String originalPrice;
     private List<String> regiImageUrlList;
     private int dealType;
-    private List<Boolean> qualityIn;
-    private List<Boolean> qualityOut;
+    private QualityGeneral qualityGeneral;
+    private List<Boolean> qualityExtraList;
     private int sellerId;
+
     private Date regiTime;
+
     private String comment;
     private boolean isTraded;
+    private String sellerBankAccountId;
 }

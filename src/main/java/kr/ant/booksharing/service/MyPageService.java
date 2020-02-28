@@ -88,7 +88,7 @@ public class MyPageService {
 
                             TransactionItem.builder()
                                     .sellItemId(buyerTransaction.getSellItemId())
-                                    .traderName(userRepository.findById(buyerTransaction.getSellerId()).get().getName())
+                                    .traderNickname(userRepository.findById(buyerTransaction.getSellerId()).get().getNickname())
                                     .traderPhoneNumber(userRepository.findById(buyerTransaction.getSellerId()).get().getPhoneNumber())
                                     .transactionType(buyerTransaction.getTransactionType())
                                     .transactionCreatedTime(buyerTransaction.getTransCreatedTime())
@@ -122,7 +122,7 @@ public class MyPageService {
 
                             TransactionItem.builder()
                                     .sellItemId(sellerTransaction.getSellItemId())
-                                    .traderName(userRepository.findById(sellerTransaction.getBuyerId()).get().getName())
+                                    .traderNickname(userRepository.findById(sellerTransaction.getBuyerId()).get().getNickname())
                                     .traderPhoneNumber(userRepository.findById(sellerTransaction.getBuyerId()).get().getPhoneNumber())
                                     .transactionType(sellerTransaction.getTransactionType())
                                     .transactionCreatedTime(sellerTransaction.getTransCreatedTime())
@@ -153,7 +153,7 @@ public class MyPageService {
 
                             TransactionItem.builder()
                                     .sellItemId(s.get_id())
-                                    .traderName("")
+                                    .traderNickname("")
                                     .traderPhoneNumber("")
                                     .transactionType(s.getDealType())
                                     .transactionCreatedTime(null)

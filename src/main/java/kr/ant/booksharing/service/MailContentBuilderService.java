@@ -1,6 +1,8 @@
 package kr.ant.booksharing.service;
 
 import kr.ant.booksharing.domain.SellItem;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,10 +24,10 @@ public class MailContentBuilderService {
         return templateEngine.process("email", context);
     }
 
-    public String buildTransRequest(SellItem sellItem, String userName, String buyerName) {
+    public String buildTransRequest(SellItem sellItem, String userName, String buyerNickname) {
         Context context = new Context();
         context.setVariable("userName", userName);
-        context.setVariable("buyerName", buyerName);
+        context.setVariable("buyerNickname", buyerNickname);
         context.setVariable("title", sellItem.getTitle());
         context.setVariable("imageUrl", sellItem.getImageUrl());
         context.setVariable("regiPrice", sellItem.getRegiPrice());
