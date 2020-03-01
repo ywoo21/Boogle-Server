@@ -27,6 +27,8 @@ public class TransactionService {
     private final JavaMailSender javaMailSender;
     private final UserRepository userRepository;
     private final BoogleBoxRepository boogleBoxRepository;
+    private final UserBankAccountRepository userBankAccountRepository;
+    private final BankRepository bankRepository;
 
     public TransactionService(final TransactionRepository transactionRepository,
                               final TransactionHistoryRepository transactionHistoryRepository,
@@ -36,7 +38,9 @@ public class TransactionService {
                               final MailContentBuilderService mailContentBuilderService,
                               final JavaMailSender javaMailSender,
                               final UserRepository userRepository,
-                              final BoogleBoxRepository boogleBoxRepository) {
+                              final BoogleBoxRepository boogleBoxRepository,
+                              final UserBankAccountRepository userBankAccountRepository,
+                              final BankRepository bankRepository) {
         this.transactionRepository = transactionRepository;
         this.transactionHistoryRepository = transactionHistoryRepository;
         this.sellItemRepository = sellItemRepository;
@@ -46,6 +50,8 @@ public class TransactionService {
         this.javaMailSender = javaMailSender;
         this.userRepository = userRepository;
         this.boogleBoxRepository = boogleBoxRepository;
+        this.userBankAccountRepository = userBankAccountRepository;
+        this.bankRepository = bankRepository;
     }
 
     /**
@@ -185,24 +191,37 @@ public class TransactionService {
             String sellerNickname = userRepository.findById(transaction.getSellerId()).get().getNickname();
             String buyerNickname = userRepository.findById(transaction.getBuyerId()).get().getNickname();
 
-            if(currStep == 1){
+            if(currStep == 0){
 
-                sendMailByStepAndTraderType(1,true,
+                sendMailByStepAndTraderType(0,true,
                         mailContentBuilderService.buildSellerBoogleBoxInfoInputRequest(sellItem, sellerUserName, buyerNickname), transaction);
-                sendMailByStepAndTraderType(1, false,
+                sendMailByStepAndTraderType(0, false,
                         mailContentBuilderService.buildBuyerPaymentRequest(sellItem, buyerUserName, sellerNickname), transaction);
 
             }
+
             else if(currStep == 3){
 
                 sendMailByStepAndTraderType(3, false,
-                        mailContentBuilderService.buildBuyerConfirmBoogleBoxInfoRequest(sellItem, buyerUserName, sellerNickname), transaction);
+                        mailContentBuilderService.buildBuyerConfirmBoogleBoxInfoRequest(sellItem, buyerUserName, sellerNickname,
+                                transaction.getBoxId(), transaction.getBoxPassword()), transaction);
 
             }
 
             else if(currStep == 5){
+
+                UserBankAccount sellerUserBankAccount =
+                        userBankAccountRepository.findBy_id(sellItem.getSellerBankAccountId()).get();
+
+                String bankName = bankRepository.findBy_id(sellerUserBankAccount.getBankId()).get().getName();
+                String accountNumber = sellerUserBankAccount.getAccountNumber();
+
+                String sellerBankAccountInfo = bankName + " " + accountNumber;
+
                 sendMailByStepAndTraderType(3, true,
-                        mailContentBuilderService.buildSellerConfirmReceiveProductAndMoneyRequest(sellItem, sellerUserName, buyerNickname), transaction);
+                        mailContentBuilderService.buildSellerConfirmReceiveProductAndMoneyRequest(sellItem, sellerUserName, buyerNickname, sellerBankAccountInfo),
+                        transaction);
+
             }
 
             return DefaultRes.res(StatusCode.CREATED, "거래 STEP 변경 성공");
@@ -328,7 +347,7 @@ public class TransactionService {
     }
 
     private void sendMailByStepAndTraderType(final int currStep, final boolean isSeller, final String content, final Transaction transaction){
-        if(currStep == 1){
+        if(currStep == 0){
             if(isSeller){
                 MimeMessagePreparator mimeMessagePreparator =
                         mailSenderService.createMimeMessage(userRepository.findById(transaction.getSellerId()).get().getEmail(),
