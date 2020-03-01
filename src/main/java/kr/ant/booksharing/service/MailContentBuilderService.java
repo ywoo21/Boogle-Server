@@ -82,6 +82,7 @@ public class MailContentBuilderService {
         context.setVariable("sellerId", sellItem.getSellerId());
         return templateEngine.process("transRequest", context);
     }
+
     public String buildSellerConfirmReceiveProductAndMoneyRequest(SellItem sellItem, String userName, String buyerNickname,
                                                                   String sellerAccountInfo) {
         Context context = new Context();
