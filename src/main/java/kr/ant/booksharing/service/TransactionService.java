@@ -61,14 +61,14 @@ public class TransactionService {
      * @return DefaultRes
      */
     public DefaultRes<Transaction> saveTransaction(Transaction transaction) {
-        try{
+        try {
 
             SellItem sellItem = sellItemRepository.findBy_id(transaction.getSellItemId()).get();
 
             sellItem.setTraded(true);
             sellItemRepository.save(sellItem);
 
-            if(!transactionRepository.findBySellItemId(transaction.getSellItemId()).isPresent()){
+            if (!transactionRepository.findBySellItemId(transaction.getSellItemId()).isPresent()) {
 
                 Item item = itemRepository.findByItemId(sellItem.getItemId()).get();
 
@@ -87,8 +87,7 @@ public class TransactionService {
 
                 transaction.setTransactionTimeList(transactionTimeList);
 
-            }
-            else{
+            } else {
 
                 Transaction curTrans =
                         transactionRepository.findBySellItemId(transaction.getSellItemId()).get();
@@ -105,7 +104,7 @@ public class TransactionService {
 
             }
 
-            final String id  = transactionRepository.save(transaction).get_id();
+            final String id = transactionRepository.save(transaction).get_id();
 
             TransactionHistory transactionHistory =
 
@@ -134,13 +133,12 @@ public class TransactionService {
             String content = mailContentBuilderService.buildTransRequest(sellItem, userName, buyerNickname);
             MimeMessagePreparator mimeMessagePreparator =
                     mailSenderService.createMimeMessage(userRepository.findById(sellItem.getSellerId()).get().getEmail(),
-                    "[북을] 구매 요청 안내", content);
+                            "[북을] 구매 요청 안내", content);
             javaMailSender.send(mimeMessagePreparator);
 
             return DefaultRes.res(StatusCode.CREATED, "거래 정보 저장 성공");
 
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println(e);
             return DefaultRes.res(StatusCode.DB_ERROR, "거래 정보 저장 실패");
 
@@ -153,10 +151,10 @@ public class TransactionService {
      * @param
      * @return DefaultRes
      */
-    public DefaultRes<List<Transaction>> findAllTransaction(){
-        try{
+    public DefaultRes<List<Transaction>> findAllTransaction() {
+        try {
             return DefaultRes.res(StatusCode.OK, "거래 정보 목록 열람 성공", transactionRepository.findAll());
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
             return DefaultRes.res(StatusCode.NOT_FOUND, "거래 정보 목록 열람 실패");
         }
@@ -169,7 +167,7 @@ public class TransactionService {
      * @return DefaultRes
      */
     public DefaultRes<Transaction> changeTransactionStep(final String sellItemId) {
-        try{
+        try {
 
             Transaction transaction = transactionRepository.findBySellItemId(sellItemId).get();
 
@@ -191,24 +189,20 @@ public class TransactionService {
             String sellerNickname = userRepository.findById(transaction.getSellerId()).get().getNickname();
             String buyerNickname = userRepository.findById(transaction.getBuyerId()).get().getNickname();
 
-            if(currStep == 0){
+            if (currStep == 0) {
 
-                sendMailByStepAndTraderType(0,true,
+                sendMailByStepAndTraderType(0, true,
                         mailContentBuilderService.buildSellerBoogleBoxInfoInputRequest(sellItem, sellerUserName, buyerNickname), transaction);
                 sendMailByStepAndTraderType(0, false,
                         mailContentBuilderService.buildBuyerPaymentRequest(sellItem, buyerUserName, sellerNickname), transaction);
 
-            }
+            } else if (currStep == 2) {
 
-            else if(currStep == 3){
-
-                sendMailByStepAndTraderType(3, false,
+                sendMailByStepAndTraderType(2, false,
                         mailContentBuilderService.buildBuyerConfirmBoogleBoxInfoRequest(sellItem, buyerUserName, sellerNickname,
                                 transaction.getBoxId(), transaction.getBoxPassword()), transaction);
 
-            }
-
-            else if(currStep == 5){
+            } else if (currStep == 4) {
 
                 UserBankAccount sellerUserBankAccount =
                         userBankAccountRepository.findBy_id(sellItem.getSellerBankAccountId()).get();
@@ -218,15 +212,14 @@ public class TransactionService {
 
                 String sellerBankAccountInfo = bankName + " " + accountNumber;
 
-                sendMailByStepAndTraderType(3, true,
+                sendMailByStepAndTraderType(4, true,
                         mailContentBuilderService.buildSellerConfirmReceiveProductAndMoneyRequest(sellItem, sellerUserName, buyerNickname, sellerBankAccountInfo),
                         transaction);
 
             }
 
             return DefaultRes.res(StatusCode.CREATED, "거래 STEP 변경 성공");
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println(e);
             return DefaultRes.res(StatusCode.DB_ERROR, "거래 STEP 변경 실패");
         }
@@ -239,13 +232,13 @@ public class TransactionService {
      * @return DefaultRes
      */
     public DefaultRes<Transaction> saveBoogleBoxIdAndPasswordAndChangeStep(final BoogleBoxInfo boogleBoxInfo) {
-        try{
+        try {
             Transaction transaction = transactionRepository.findBySellItemId(boogleBoxInfo.getSellItemId()).get();
             transaction.setBoxId(boogleBoxInfo.getId());
             transaction.setBoxPassword(boogleBoxInfo.getPassword());
             transactionRepository.save(transaction);
 
-            if(transaction.isPaymentDone()){
+            if (transaction.isPaymentDone()) {
                 changeTransactionStep(boogleBoxInfo.getSellItemId());
             }
 
@@ -262,8 +255,7 @@ public class TransactionService {
             boogleBoxRepository.save(boogleBox);
 
             return DefaultRes.res(StatusCode.CREATED, "북을 박스 정보 저장");
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println(e);
             return DefaultRes.res(StatusCode.DB_ERROR, "북을 박스 정보 실패");
         }
@@ -276,19 +268,18 @@ public class TransactionService {
      * @return DefaultRes
      */
     public DefaultRes<Transaction> savePaymentDoneAndChangeStep(final String sellItemId) {
-        try{
+        try {
 
             Transaction transaction = transactionRepository.findBySellItemId(sellItemId).get();
             transaction.setPaymentDone(true);
             transactionRepository.save(transaction);
 
-            if(!transaction.getBoxId().equals("") && !transaction.getBoxPassword().equals("")){
+            if (!transaction.getBoxId().equals("") && !transaction.getBoxPassword().equals("")) {
                 changeTransactionStep(sellItemId);
             }
 
             return DefaultRes.res(StatusCode.CREATED, "송금 완료 상태 저장 성공");
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println(e);
             return DefaultRes.res(StatusCode.DB_ERROR, "송금 완료 상태 저장 실패");
         }
@@ -301,7 +292,7 @@ public class TransactionService {
      * @return DefaultRes
      */
     public DefaultRes<Transaction> deleteTransaction(final String sellItemId) {
-        try{
+        try {
             transactionRepository.deleteBySellItemId(sellItemId);
             transactionHistoryRepository.deleteBySellItemId(sellItemId);
             SellItem sellItem =
@@ -309,8 +300,7 @@ public class TransactionService {
             sellItem.setTraded(false);
             sellItemRepository.save(sellItem);
             return DefaultRes.res(StatusCode.OK, "거래 취소 성공");
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println(e);
             return DefaultRes.res(StatusCode.DB_ERROR, "거래 취소 실패");
         }
@@ -318,14 +308,12 @@ public class TransactionService {
 
     /**
      * step2 거래 정보 목록 열람
-     *
-     *
      */
-    public DefaultRes<List<Transaction>> findAllStepTwoTransaction(){
-        try{
+    public DefaultRes<List<Transaction>> findAllStepTwoTransaction() {
+        try {
             return DefaultRes.res(StatusCode.OK, "step2 거래 정보 목록 열람 성공",
                     transactionRepository.findAllByStepEquals(2).get());
-        } catch(Exception e) {
+        } catch (Exception e) {
             System.out.println(e);
             return DefaultRes.res(StatusCode.NOT_FOUND, "step2 거래 정보 목록 열람 실패");
         }
@@ -333,49 +321,46 @@ public class TransactionService {
 
     /**
      * step4 거래 정보 목록 열람
-     *
-     *
      */
-    public DefaultRes<List<Transaction>> findAllStepFourTransaction(){
-        try{
+    public DefaultRes<List<Transaction>> findAllStepFourTransaction() {
+        try {
             return DefaultRes.res(StatusCode.OK, "step4 거래 정보 목록 열람 성공",
                     transactionRepository.findAllByStepEquals(4).get());
-        } catch(Exception e) {
+        } catch (Exception e) {
             System.out.println(e);
             return DefaultRes.res(StatusCode.NOT_FOUND, "step4 거래 정보 목록 열람 실패");
         }
     }
 
-    private void sendMailByStepAndTraderType(final int currStep, final boolean isSeller, final String content, final Transaction transaction){
-        if(currStep == 0){
-            if(isSeller){
+    private void sendMailByStepAndTraderType(final int currStep, final boolean isSeller, final String content, final Transaction transaction) {
+
+        if (currStep == 0) {
+            if (isSeller) {
                 MimeMessagePreparator mimeMessagePreparator =
                         mailSenderService.createMimeMessage(userRepository.findById(transaction.getSellerId()).get().getEmail(),
                                 "[북을] 북을박스 비치 안내", content);
                 javaMailSender.send(mimeMessagePreparator);
-            }
-            else{
+            } else {
                 MimeMessagePreparator mimeMessagePreparator =
                         mailSenderService.createMimeMessage(userRepository.findById(transaction.getBuyerId()).get().getEmail(),
                                 "[북을] 판매대금 입금 안내", content);
                 javaMailSender.send(mimeMessagePreparator);
             }
-        }
-        else if(currStep == 3){
-            if(!isSeller){
+        } else if (currStep == 2) {
+            if (!isSeller) {
                 MimeMessagePreparator mimeMessagePreparator =
                         mailSenderService.createMimeMessage(userRepository.findById(transaction.getBuyerId()).get().getEmail(),
                                 "[북을] 물품 수령 안내", content);
                 javaMailSender.send(mimeMessagePreparator);
             }
-        }
-        else if(currStep == 5){
-            if(isSeller){
+        } else if (currStep == 4) {
+            if (isSeller) {
                 MimeMessagePreparator mimeMessagePreparator =
                         mailSenderService.createMimeMessage(userRepository.findById(transaction.getSellerId()).get().getEmail(),
                                 "[북을] 판매대금 송금 안내", content);
                 javaMailSender.send(mimeMessagePreparator);
             }
         }
+
     }
 }

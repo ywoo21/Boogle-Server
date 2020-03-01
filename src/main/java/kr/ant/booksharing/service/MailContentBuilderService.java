@@ -14,6 +14,7 @@ import java.util.Date;
 
 @Service
 public class MailContentBuilderService {
+
     @Autowired
     private TemplateEngine templateEngine;
 
@@ -80,7 +81,7 @@ public class MailContentBuilderService {
         Date regiTime = sellItem.getRegiTime();
         context.setVariable("regiTime", format.format(regiTime));
         context.setVariable("sellerId", sellItem.getSellerId());
-        return templateEngine.process("transRequest", context);
+        return templateEngine.process("buyerConfirmBoogleBoxInfoRequest", context);
     }
 
     public String buildSellerConfirmReceiveProductAndMoneyRequest(SellItem sellItem, String userName, String buyerNickname,
@@ -96,7 +97,7 @@ public class MailContentBuilderService {
         Date regiTime = sellItem.getRegiTime();
         context.setVariable("regiTime", format.format(regiTime));
         context.setVariable("sellerId", sellItem.getSellerId());
-        return templateEngine.process("transRequest", context);
+        return templateEngine.process("sellerConfirmReceiveProductAndMoneyRequest.html", context);
     }
 
 }
