@@ -37,4 +37,60 @@ public class MailContentBuilderService {
         context.setVariable("sellerId", sellItem.getSellerId());
         return templateEngine.process("transRequest", context);
     }
+
+    public String buildSellerBoogleBoxInfoInputRequest(SellItem sellItem, String userName, String buyerNickname) {
+        Context context = new Context();
+        context.setVariable("userName", userName);
+        context.setVariable("buyerNickname", buyerNickname);
+        context.setVariable("title", sellItem.getTitle());
+        context.setVariable("imageUrl", sellItem.getImageUrl());
+        context.setVariable("regiPrice", sellItem.getRegiPrice());
+        SimpleDateFormat format = new SimpleDateFormat ( "yyyy.MM.dd");
+        Date regiTime = sellItem.getRegiTime();
+        context.setVariable("regiTime", format.format(regiTime));
+        context.setVariable("sellerId", sellItem.getSellerId());
+        return templateEngine.process("transRequest", context);
+    }
+
+    public String buildBuyerPaymentRequest(SellItem sellItem, String userName, String buyerNickname) {
+        Context context = new Context();
+        context.setVariable("userName", userName);
+        context.setVariable("buyerNickname", buyerNickname);
+        context.setVariable("title", sellItem.getTitle());
+        context.setVariable("imageUrl", sellItem.getImageUrl());
+        context.setVariable("regiPrice", sellItem.getRegiPrice());
+        SimpleDateFormat format = new SimpleDateFormat ( "yyyy.MM.dd");
+        Date regiTime = sellItem.getRegiTime();
+        context.setVariable("regiTime", format.format(regiTime));
+        context.setVariable("sellerId", sellItem.getSellerId());
+        return templateEngine.process("transRequest", context);
+    }
+
+    public String buildBuyerConfirmBoogleBoxInfoRequest(SellItem sellItem, String userName, String buyerNickname) {
+        Context context = new Context();
+        context.setVariable("userName", userName);
+        context.setVariable("buyerNickname", buyerNickname);
+        context.setVariable("title", sellItem.getTitle());
+        context.setVariable("imageUrl", sellItem.getImageUrl());
+        context.setVariable("regiPrice", sellItem.getRegiPrice());
+        SimpleDateFormat format = new SimpleDateFormat ( "yyyy.MM.dd");
+        Date regiTime = sellItem.getRegiTime();
+        context.setVariable("regiTime", format.format(regiTime));
+        context.setVariable("sellerId", sellItem.getSellerId());
+        return templateEngine.process("transRequest", context);
+    }
+    public String buildSellerConfirmReceiveProductAndMoneyRequest(SellItem sellItem, String userName, String buyerNickname) {
+        Context context = new Context();
+        context.setVariable("userName", userName);
+        context.setVariable("buyerNickname", buyerNickname);
+        context.setVariable("title", sellItem.getTitle());
+        context.setVariable("imageUrl", sellItem.getImageUrl());
+        context.setVariable("regiPrice", sellItem.getRegiPrice());
+        SimpleDateFormat format = new SimpleDateFormat ( "yyyy.MM.dd");
+        Date regiTime = sellItem.getRegiTime();
+        context.setVariable("regiTime", format.format(regiTime));
+        context.setVariable("sellerId", sellItem.getSellerId());
+        return templateEngine.process("transRequest", context);
+    }
+
 }

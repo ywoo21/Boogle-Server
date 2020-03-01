@@ -121,10 +121,14 @@ public class TransactionService {
             String buyerNickname = userRepository.findById(transaction.getBuyerId()).get().getNickname();
             String userName = userRepository.findById(transaction.getSellerId()).get().getName();
 
+            String imageUrl = sellItem.getImageUrl();
+            imageUrl = imageUrl.replace("type=m1", "");
+            sellItem.setImageUrl(imageUrl);
+
             String content = mailContentBuilderService.buildTransRequest(sellItem, userName, buyerNickname);
             MimeMessagePreparator mimeMessagePreparator =
                     mailSenderService.createMimeMessage(userRepository.findById(sellItem.getSellerId()).get().getEmail(),
-                    "구매 요청", content);
+                    "[북을] 구매 요청 안내", content);
             javaMailSender.send(mimeMessagePreparator);
 
             return DefaultRes.res(StatusCode.CREATED, "거래 정보 저장 성공");
@@ -160,7 +164,11 @@ public class TransactionService {
      */
     public DefaultRes<Transaction> changeTransactionStep(final String sellItemId) {
         try{
+
             Transaction transaction = transactionRepository.findBySellItemId(sellItemId).get();
+
+            int currStep = transaction.getStep();
+
             transaction.setStep(transaction.getStep() + 1);
 
             List<Date> currentTransactionTimeList = transaction.getTransactionTimeList();
@@ -168,6 +176,35 @@ public class TransactionService {
 
             transaction.setTransactionTimeList(currentTransactionTimeList);
             transactionRepository.save(transaction);
+
+            SellItem sellItem = sellItemRepository.findBy_id(transaction.getSellItemId()).get();
+
+            String sellerUserName = userRepository.findById(transaction.getSellerId()).get().getName();
+            String buyerUserName = userRepository.findById(transaction.getBuyerId()).get().getName();
+
+            String sellerNickname = userRepository.findById(transaction.getSellerId()).get().getNickname();
+            String buyerNickname = userRepository.findById(transaction.getBuyerId()).get().getNickname();
+
+            if(currStep == 1){
+
+                sendMailByStepAndTraderType(1,true,
+                        mailContentBuilderService.buildSellerBoogleBoxInfoInputRequest(sellItem, sellerUserName, buyerNickname), transaction);
+                sendMailByStepAndTraderType(1, false,
+                        mailContentBuilderService.buildBuyerPaymentRequest(sellItem, buyerUserName, sellerNickname), transaction);
+
+            }
+            else if(currStep == 3){
+
+                sendMailByStepAndTraderType(3, false,
+                        mailContentBuilderService.buildBuyerConfirmBoogleBoxInfoRequest(sellItem, buyerUserName, sellerNickname), transaction);
+
+            }
+
+            else if(currStep == 5){
+                sendMailByStepAndTraderType(3, true,
+                        mailContentBuilderService.buildSellerConfirmReceiveProductAndMoneyRequest(sellItem, sellerUserName, buyerNickname), transaction);
+            }
+
             return DefaultRes.res(StatusCode.CREATED, "거래 STEP 변경 성공");
         }
         catch(Exception e){
@@ -287,6 +324,39 @@ public class TransactionService {
         } catch(Exception e) {
             System.out.println(e);
             return DefaultRes.res(StatusCode.NOT_FOUND, "step4 거래 정보 목록 열람 실패");
+        }
+    }
+
+    private void sendMailByStepAndTraderType(final int currStep, final boolean isSeller, final String content, final Transaction transaction){
+        if(currStep == 1){
+            if(isSeller){
+                MimeMessagePreparator mimeMessagePreparator =
+                        mailSenderService.createMimeMessage(userRepository.findById(transaction.getSellerId()).get().getEmail(),
+                                "[북을] 북을박스 비치 안내", content);
+                javaMailSender.send(mimeMessagePreparator);
+            }
+            else{
+                MimeMessagePreparator mimeMessagePreparator =
+                        mailSenderService.createMimeMessage(userRepository.findById(transaction.getBuyerId()).get().getEmail(),
+                                "[북을] 판매대금 입금 안내", content);
+                javaMailSender.send(mimeMessagePreparator);
+            }
+        }
+        else if(currStep == 3){
+            if(!isSeller){
+                MimeMessagePreparator mimeMessagePreparator =
+                        mailSenderService.createMimeMessage(userRepository.findById(transaction.getBuyerId()).get().getEmail(),
+                                "[북을] 물품 수령 안내", content);
+                javaMailSender.send(mimeMessagePreparator);
+            }
+        }
+        else if(currStep == 5){
+            if(isSeller){
+                MimeMessagePreparator mimeMessagePreparator =
+                        mailSenderService.createMimeMessage(userRepository.findById(transaction.getSellerId()).get().getEmail(),
+                                "[북을] 판매대금 송금 안내", content);
+                javaMailSender.send(mimeMessagePreparator);
+            }
         }
     }
 }

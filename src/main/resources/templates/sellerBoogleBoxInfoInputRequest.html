@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
@@ -19,6 +20,16 @@
             border-left: none;
             border-right: none;
             opacity: 0.8;
+        }
+        .description-title {
+            text-align: center;
+            font-family: 'Noto Sans KR', 'helvetica', sans-serif;
+            font-size: 15px;
+            font-weight: normal;
+            line-height: 1.67;
+            letter-spacing: normal;
+            color: #292929;
+            margin : 20px 0px 0px 0px;
         }
         .description {
             text-align: center;
@@ -86,7 +97,7 @@
             right: 60px;
         }
         .button_styled {
-            display: flex;
+            display: inline;
             justify-content: center;
             margin: 0 auto;
             border: 0;
@@ -102,34 +113,70 @@
             background-color:#339eac;
             box-shadow: 9px 9px 16px rgba(163,177,198,0.6), -9px -9px 16px    rgba(255,255,255, 0.5);
         }
+        .button_styled_black {
+            display: inline;
+            justify-content: center;
+            margin: 0 auto;
+            border: 0;
+            line-height: 2.5;
+            padding: 0 20px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: center;
+            color: #fff;
+            border-radius: 10px;
+            width:153px;
+            height:39px;
+            background-color:#707070;
+            box-shadow: 9px 9px 16px rgba(163,177,198,0.6), -9px -9px 16px    rgba(255,255,255, 0.5);
+        }
+        @media (min-width: 320px) and (max-width : 599px) {
             #container {
                 width: 100%;
                 height: 100%;
                 margin: 10vh auto 0vh auto;
                 border: 1px solid #339EAC;
-                text-align: center;
             }
+        }
+        @media (min-width: 320px) and (max-width : 599px) {
+            #container {
+                width: 100%;
+                height: 100%;
+                margin: 10vh auto 0vh auto;
+                border: 1px solid #339EAC;
+            }
+        }
+        @media (min-width: 600px) {
+            #container {
+                width: 50%;
+                height: 100%;
+                margin: 10vh auto 0vh auto;
+                border: 1px solid #339EAC;
+            }
+        }
     </style>
 </head>
 <body>
 <div id="container">
-    <img src="boogle_square.png" width="100%" height="85.8px">
-    <img class="logo" src="boogle.png" width="46.1px">
+    <img src="https://project-youngwoo.s3.ap-northeast-2.amazonaws.com/email_top.png" width="100%" height="85.8px">
+    <img class="logo" src="https://project-youngwoo.s3.ap-northeast-2.amazonaws.com/logo_gray.png" width="46.1px">
     <div class="inbox">
-        <p class="description">정의현 님, 안녕하세요! <br>북을박스에 구매하신 도서가 비치되었습니다.<br>구매 정보를 확인하시고<br>북을 박스에서 도서를 수령해주세요.</p>
+        <p class="description-title" th:text="${userName + ' 님, 안녕하세요, 북을입니다.'}"></p>
+        <p class="description" th:text="${'북을에 등록하신' + title + ' 을 베르크만스 우정원 2층, 그라찌에 옆에'}"></p>
         <div class="content">
-            <img class="bookimg" src="https://image.aladin.co.kr/product/5214/82/cover500/8962183676_1.jpg">
+            <img class="bookimg" th:src="${imageUrl}">
             <div class="book_content">
-                <h1 class="book_title"> 맨큐의 경제학 (7판)</h1>
-                <h3 class="trans_content">주문일자: 2020.01.03 | 금액: 8000원 </h3>
-                <h2 class="seller_name">판매자: 홍길동 </h2>
-                <a href="#" target="_blank" class="transaction_history">거래내역 더보기</a>
+                <h1 th:text="${title}" class="book_title" ></h1>
+                <h3 th:text="${'주문일자 : ' + regiTime + ' | 금액 : ' + regiPrice + '원'}" class="trans_content"></h3>
+                <h2 th:text="${'구매자 : ' +  buyerNickname}" class="seller_name"></h2>
             </div>
         </div>
-        <input class="button_styled"
-               type="button"
-               value="수령하기">
+        <div style="text-align: center">
+            <button class="button_styled"
+            ><a href="http://boogle.shop/mypage" style="color:#ffffff;">거래 진행/파기</a></button>
+        </div>
     </div>
+    <p style="padding : 10px 0px 10px 20px; color : #eb4b03;"s>*모든 거래 관련 고지사항은 이메일을 통해 알려드리오니 꼭 확인해주세요</p>
 </div>
 </body>
 </html>

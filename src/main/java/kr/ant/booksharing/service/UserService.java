@@ -211,7 +211,7 @@ public class UserService {
             String content = mailContentBuilderService.buildEmailAuth(userName, code);
 
             MimeMessagePreparator messagePreparator =
-                    mailSenderService.createMimeMessage(campusEmail, "북을 이메일 인증", content);
+                    mailSenderService.createMimeMessage(campusEmail, "[북을] 회원가입 인증", content);
 
             javaMailSender.send(messagePreparator);
             return DefaultRes.res(StatusCode.OK, "메일 전송 성공");
