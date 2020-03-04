@@ -3,6 +3,7 @@ package kr.ant.booksharing.controller;
 import kr.ant.booksharing.domain.Item;
 import kr.ant.booksharing.domain.SellItem;
 import kr.ant.booksharing.model.ItemRes;
+import kr.ant.booksharing.repository.ItemReceivingRepository;
 import kr.ant.booksharing.repository.ItemRepository;
 import kr.ant.booksharing.repository.SellItemRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -33,11 +34,14 @@ public class NaverBookApiController {
 
     private final SellItemRepository sellItemRepository;
     private final ItemRepository itemRepository;
+    private final ItemReceivingRepository itemReceivingRepository;
 
     public NaverBookApiController(final SellItemRepository sellItemRepository,
-                                  final ItemRepository itemRepository) {
+                                  final ItemRepository itemRepository,
+                                  final ItemReceivingRepository itemReceivingRepository) {
         this.sellItemRepository = sellItemRepository;
         this.itemRepository = itemRepository;
+        this.itemReceivingRepository = itemReceivingRepository;
     }
 
     @GetMapping("naver/bookApi/buy/title")
@@ -125,6 +129,11 @@ public class NaverBookApiController {
 
                         itemRes.setItemId(itemId);
                     }
+
+                    if(itemReceivingRepository.findByItemId(itemRes.getItemId()).isPresent()){
+                        itemRes.setItemReceivingRegistered(true);
+                    }
+                    else { itemRes.setItemReceivingRegistered(false); }
 
                     itemRes.setTitle(jsonObject.get("title").toString()
                             .replace("<b>", "").replace("</b>", ""));

@@ -16,4 +16,5 @@ public class ItemRes {
     private String price;
     private String regiPrice;
     private int regiCount;
+    private boolean isItemReceivingRegistered;
 }

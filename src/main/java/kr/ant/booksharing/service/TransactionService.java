@@ -189,6 +189,10 @@ public class TransactionService {
             String sellerNickname = userRepository.findById(transaction.getSellerId()).get().getNickname();
             String buyerNickname = userRepository.findById(transaction.getBuyerId()).get().getNickname();
 
+            String imageUrl = sellItem.getImageUrl();
+            imageUrl = imageUrl.replace("type=m1", "");
+            sellItem.setImageUrl(imageUrl);
+
             if (currStep == 0) {
 
                 sendMailByStepAndTraderType(0, true,
