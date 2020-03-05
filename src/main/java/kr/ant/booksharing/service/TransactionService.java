@@ -336,6 +336,41 @@ public class TransactionService {
         }
     }
 
+    /**
+     * 구매자 이름 확인
+     */
+    public DefaultRes<String> findBuyerName(final int userId) {
+        try {
+            return DefaultRes.res(StatusCode.OK, "구매자 이름 확인 성공", userRepository.findById(userId).get().getName());
+        } catch (Exception e) {
+            System.out.println(e);
+            return DefaultRes.res(StatusCode.NOT_FOUND, "구매자 이름 확인 실패");
+        }
+    }
+
+    /**
+     * 판매자 계좌 정보 확인
+     */
+    public DefaultRes<String> findSellerBankAccount(final String sellItemId) {
+        try {
+
+            String sellerBankAccountId = sellItemRepository.findBy_id(sellItemId).get().getSellerBankAccountId();
+
+            UserBankAccount sellerBankAccount =
+                    userBankAccountRepository.findBy_id(sellerBankAccountId).get();
+
+            String sellerUserBankAccountIncludingBankName =
+                    bankRepository.findBy_id(sellerBankAccount.getBankId()).get().getName() +
+                            "/" + sellerBankAccount.getAccountNumber() + "/"
+                            + sellerBankAccount.getDepositorName();
+
+            return DefaultRes.res(StatusCode.OK, "판매자 계좌 정보 확인 성공", sellerUserBankAccountIncludingBankName);
+        } catch (Exception e) {
+            System.out.println(e);
+            return DefaultRes.res(StatusCode.NOT_FOUND, "판매자 계좌 정보 실패");
+        }
+    }
+
     private void sendMailByStepAndTraderType(final int currStep, final boolean isSeller, final String content, final Transaction transaction) {
 
         if (currStep == 0) {
