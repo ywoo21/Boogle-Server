@@ -189,6 +189,10 @@ public class TransactionService {
             String sellerNickname = userRepository.findById(transaction.getSellerId()).get().getNickname();
             String buyerNickname = userRepository.findById(transaction.getBuyerId()).get().getNickname();
 
+            String imageUrl = sellItem.getImageUrl();
+            imageUrl = imageUrl.replace("type=m1", "");
+            sellItem.setImageUrl(imageUrl);
+
             if (currStep == 0) {
 
                 sendMailByStepAndTraderType(0, true,
@@ -329,6 +333,41 @@ public class TransactionService {
         } catch (Exception e) {
             System.out.println(e);
             return DefaultRes.res(StatusCode.NOT_FOUND, "step4 거래 정보 목록 열람 실패");
+        }
+    }
+
+    /**
+     * 구매자 이름 확인
+     */
+    public DefaultRes<String> findBuyerName(final int userId) {
+        try {
+            return DefaultRes.res(StatusCode.OK, "구매자 이름 확인 성공", userRepository.findById(userId).get().getName());
+        } catch (Exception e) {
+            System.out.println(e);
+            return DefaultRes.res(StatusCode.NOT_FOUND, "구매자 이름 확인 실패");
+        }
+    }
+
+    /**
+     * 판매자 계좌 정보 확인
+     */
+    public DefaultRes<String> findSellerBankAccount(final String sellItemId) {
+        try {
+
+            String sellerBankAccountId = sellItemRepository.findBy_id(sellItemId).get().getSellerBankAccountId();
+
+            UserBankAccount sellerBankAccount =
+                    userBankAccountRepository.findBy_id(sellerBankAccountId).get();
+
+            String sellerUserBankAccountIncludingBankName =
+                    bankRepository.findBy_id(sellerBankAccount.getBankId()).get().getName() +
+                            "/" + sellerBankAccount.getAccountNumber() + "/"
+                            + sellerBankAccount.getDepositorName();
+
+            return DefaultRes.res(StatusCode.OK, "판매자 계좌 정보 확인 성공", sellerUserBankAccountIncludingBankName);
+        } catch (Exception e) {
+            System.out.println(e);
+            return DefaultRes.res(StatusCode.NOT_FOUND, "판매자 계좌 정보 실패");
         }
     }
 

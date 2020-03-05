@@ -103,6 +103,36 @@ public class AdminController {
     }
 
     /**
+     * 구매자 이름 조회
+     *
+     * @return ResponseEntity
+     */
+    @GetMapping("/buyerName")
+    public ResponseEntity getBuyerName(@RequestParam("userId")final int userId) {
+        try {
+            return new ResponseEntity<>(transactionService.findBuyerName(userId),HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("{}", e);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
+     * 판매자 계좌 정보 조회
+     *
+     * @return ResponseEntity
+     */
+    @GetMapping("/sellerBankAccount")
+    public ResponseEntity getSellerBankAccount(@RequestParam("sellItemId")final String sellItemId) {
+        try {
+            return new ResponseEntity<>(transactionService.findSellerBankAccount(sellItemId),HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("{}", e);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
      * 북을박스 전체 정보 조회
      *
      * @return ResponseEntity
