@@ -23,7 +23,7 @@
             color: #292929;
             margin : 20px 0px 0px 0px;"
 
-           th:text="${userName + ' 님 안녕하세요, 북을입니다.'}"></p>
+           th:text="${userName + ' 님 안녕하세요, 북을입니다. 구매자가 북을박스에 비치된 ' + title + '을 안전하게 수령했습니다.'}"></p>
 
         <p style="
             text-align: center;
@@ -32,7 +32,7 @@
             font-weight: normal;
             line-height: 1.67;
             letter-spacing: normal;
-            color: #292929;" th:text="${'북을에 등록하신 ' + title + '에 대한 구매 요청이 들어왔습니다!'}"></p>
+            color: #292929;" th:text="${''}"></p>
 
         <p style="
             text-align: center;
@@ -41,7 +41,25 @@
             font-weight: normal;
             line-height: 1.67;
             letter-spacing: normal;
-            color: #292929;" th:text="${'아래 첨부된 버튼을 통해 꼭! 거래 진행 여부를 알려주시기 바랍니다.'}"></p>
+            color: #292929;" th:text="${'이에 따라, 거래 대금인 ' + regiPrice + '원이 24시간 이내에 ' + userName + ' 님의 ' + sellerAccountInfo + ' 계좌로 입금될 예정입니다.' }"></p>
+
+        <p style="
+            text-align: center;
+            font-family: 'Noto Sans KR', 'helvetica', sans-serif;
+            font-size: 15px;
+            font-weight: normal;
+            line-height: 1.67;
+            letter-spacing: normal;
+            color: #292929;" th:text="${''}"></p>
+
+        <p style="
+            text-align: center;
+            font-family: 'Noto Sans KR', 'helvetica', sans-serif;
+            font-size: 15px;
+            font-weight: normal;
+            line-height: 1.67;
+            letter-spacing: normal;
+            color: #292929;">입금 관련 문의사항은 <a href="http://pf.kakao.com/_xnlmlxb">1:1 상담</a>을 이용해주시길 바랍니다.</p>
 
         <div style="
             width: 90%;
@@ -79,7 +97,7 @@
                 font-weight: 300;
                 line-height: 1.21;
                 text-align: left;
-                color: #656565;" th:text="${'등록일자 : ' + regiTime + ' | 금액 : ' + regiPrice + '원'}"></h3>
+                color: #656565;" th:text="${'주문일자 : ' + regiTime + ' | 금액 : ' + regiPrice + '원'}"></h3>
 
                 <h2 style="
                 font-family: 'Noto Sans KR', 'helvetica', sans-serif;
@@ -90,27 +108,11 @@
                 color: #292929;" th:text="${'구매자 : ' +  buyerNickname}"></h2>
             </div>
         </div>
-        <div style="text-align: center">
-            <button style="
-            display: inline;
-            justify-content: center;
-            margin: 0 auto;
-            border: 0;
-            line-height: 2.5;
-            padding: 0 20px;
-            font-size: 1rem;
-            font-weight: 500;
-            text-align: center;
-            color: #fff;
-            border-radius: 10px;
-            width:153px;
-            height:39px;
-            background-color:#339eac;
-            box-shadow: 9px 9px 16px rgba(163,177,198,0.6), -9px -9px 16px rgba(255,255,255, 0.5);"
-            ><a href="http://boogle.shop/mypage" style="color:#ffffff;">거래 진행/파기</a></button>
-        </div>
     </div>
-    <p style="padding : 10px 0px 10px 20px; color : #eb4b03;"s>*모든 거래 관련 고지사항은 이메일을 통해 알려드리오니 꼭 확인해주세요</p>
+    <div style="padding: 2px 0 12px 0;">
+        <p style="color : #292929; text-align: center">북을을 믿고 거래해주셔서 감사합니다.</p>
+        <p style="color : #292929; text-align: center">항상 편리하고 믿음직한 거래 환경을 제공하는 '북을'이 되겠습니다.</p>
+    </div>
 </div>
 </body>
 </html>

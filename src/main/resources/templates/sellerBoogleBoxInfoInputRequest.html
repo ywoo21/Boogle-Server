@@ -23,7 +23,7 @@
             color: #292929;
             margin : 20px 0px 0px 0px;"
 
-           th:text="${userName + ' 님 안녕하세요, 북을입니다.'}"></p>
+           th:text="${userName + ' 님 안녕하세요, 북을입니다. ' + title + ' 을 베르크만스 우정원 2층, 그라찌에 옆에 위치한 북을박스에 48시간 이내에 비치해주세요!'}"></p>
 
         <p style="
             text-align: center;
@@ -32,7 +32,7 @@
             font-weight: normal;
             line-height: 1.67;
             letter-spacing: normal;
-            color: #292929;" th:text="${'북을에 등록하신 ' + title + '에 대한 구매 요청이 들어왔습니다!'}"></p>
+            color: #292929;" th:text="${''}"></p>
 
         <p style="
             text-align: center;
@@ -41,7 +41,43 @@
             font-weight: normal;
             line-height: 1.67;
             letter-spacing: normal;
-            color: #292929;" th:text="${'아래 첨부된 버튼을 통해 꼭! 거래 진행 여부를 알려주시기 바랍니다.'}"></p>
+            color: #292929;" th:text="${'물품을 안전하게 비치하신 후, 아래 버튼을 통해 북을박스 번호와 비밀번호를 저희에게 알려주세요! 48시간 이내에 북을박스 번호와 비밀번호가 확인되지 않을 시' + userName + ' 님의 신용도가 떨어져 이후 거래에 불이익을 받을 수 있습니다. :-('}"></p>
+
+        <p style="
+            text-align: center;
+            font-family: 'Noto Sans KR', 'helvetica', sans-serif;
+            font-size: 15px;
+            font-weight: normal;
+            line-height: 1.67;
+            letter-spacing: normal;
+            color: #292929;" th:text="${''}"></p>
+
+        <p style="
+            text-align: center;
+            font-family: 'Noto Sans KR', 'helvetica', sans-serif;
+            font-size: 15px;
+            font-weight: normal;
+            line-height: 1.67;
+            letter-spacing: normal;
+            color: #292929;" th:text="${'구매자의 물품 수령 후, 판매대금 입금과 관련한 안내 메일을 발송해 드리겠습니다.'}"></p>
+
+        <p style="
+            text-align: center;
+            font-family: 'Noto Sans KR', 'helvetica', sans-serif;
+            font-size: 15px;
+            font-weight: normal;
+            line-height: 1.67;
+            letter-spacing: normal;
+            color: #292929;" th:text="${''}"></p>
+
+        <p style="
+            text-align: center;
+            font-family: 'Noto Sans KR', 'helvetica', sans-serif;
+            font-size: 15px;
+            font-weight: normal;
+            line-height: 1.67;
+            letter-spacing: normal;
+            color: #292929;" th:text="${'감사합니다.'}"></p>
 
         <div style="
             width: 90%;
@@ -107,7 +143,7 @@
             height:39px;
             background-color:#339eac;
             box-shadow: 9px 9px 16px rgba(163,177,198,0.6), -9px -9px 16px rgba(255,255,255, 0.5);"
-            ><a href="http://boogle.shop/mypage" style="color:#ffffff;">거래 진행/파기</a></button>
+            ><a href="http://boogle.shop/mypage" style="color:#ffffff;">비치하기</a></button>
         </div>
     </div>
     <p style="padding : 10px 0px 10px 20px; color : #eb4b03;"s>*모든 거래 관련 고지사항은 이메일을 통해 알려드리오니 꼭 확인해주세요</p>
