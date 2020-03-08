@@ -1,56 +1,38 @@
-# Boogle-Server
-Boogle Server App Repository
+# Boogle
 
-# API
+캠퍼스에 특화된 전자 상거래 플랫폼 <북을>
 
-## USERS
+프로젝트 기간 : 2019년 4월 1일 ~
 
-| 메소드 | 경로                                      | 설명                      |
-| ------ | ----------------------------------------- | ------------------------- |
-| POST   | /users/signup                             | 회원가입                  |
-| GET    | /users/signup/validateEmail?email={email} | 회원가입 이메일 중복 체크 |
-| POST   | /users/signin                             | 로그인                    |
+참여한 팀원 : 박영우, 최우혁, 김유진, 최서온, 정의현, 홍진석, 이예지, 김수빈, 김지우, 김예진, 정준화, 조수빈, 최하은, 현준호, 강우창, 최재영
 
-## LISTS
+## About This Repository
 
-| 메소드 | 경로                              | 설명                       |
-| ------ | --------------------------------- | -------------------------- |
-| GET    | /lists                            | 모든 판매 도서 목록 조회   |
-| GET    | /lists/searches?keyword={keyword} | 검색된 판매 도서 목록 조회 |
-| GET    | /lists/adv?bookId={bookId}        | 판매 도서 상세 조회        |
-| POST   | /lists/sell                       | 판매 도서 등록             |
-| POST   | /lists/buy                        | 도서 구매 확정             |
+<북을>의 Spring Boot 프로젝트입니다.
 
-## MY PAGE
+## Server API WIKI
 
-| 메소드 | 경로                            | 설명                             | 비고               |
-| ------ | ------------------------------- | -------------------------------- | ------------------ |
-| GET    | /myPage/buyList?email={email}   | 마이페이지 구매 목록 조회        |                    |
-| GET    | /myPage/sellList?email={email}  | 마이페이지 판매 목록 조회        |                    |
-| POST   | /myPage/buyList/updateState     | 마이페이지 구매 상태 변경        | state 1 -> state 2 |
-| DELETE | /myPage/buyList?bookId={bookId} | 마이페이지 등록된 판매 도서 삭제 |                    |
-
-## NAVER BOOK API
-
-| 메소드 | 경로                             | 설명                                 |
-| ------ | -------------------------------- | ------------------------------------ |
-| GET    | /naver/bookApi?keyword={keyword} | 네이버 도서 검색 API 일반 검색(제목) |
-| GET    | /naver/bookApi/adv?isbn={isbn}   | 네이버 도서 검색 API 상세 검색(ISBN) |
-
-# DATABASE
-
-## ERD
-
-![북을_ERD](https://user-images.githubusercontent.com/23696493/64671045-2742f200-d4a2-11e9-863e-014acd1bde87.png)
-
-# API DOCUMENT
-
-### BASE URL : 13.125.191.60:8080
+### BASE URL : 13.124.113.72:8080
 
 #### [회원(USERS) API](https://github.com/ywoo21/Boogle-Server/wiki/회원(USERS)-API)
-#### [판매/구매 도서 목록(LISTS) API](https://github.com/ywoo21/Boogle-Server/wiki/%ED%8C%90%EB%A7%A4-%EA%B5%AC%EB%A7%A4-%EB%8F%84%EC%84%9C-%EB%AA%A9%EB%A1%9D(LISTS))
-#### [마이페이지(MY PAGE) API](https://github.com/ywoo21/Boogle-Server/wiki/마이페이지(MY-PAGE)-API)
+#### [판매 상품(SELL ITEM) API](https://github.com/ywoo21/Boogle-Server/wiki/%ED%8C%90%EB%A7%A4-%EC%83%81%ED%92%88-(SELL-ITEM))
+#### [거래(TRANSACTION) API](https://github.com/ywoo21/Boogle-Server/wiki/%EA%B1%B0%EB%9E%98(TRANSACTION))
+#### [찜하기(USER BOOKMARK) API](https://github.com/ywoo21/Boogle-Server/wiki/%EC%B0%9C%ED%95%98%EA%B8%B0(UserBookmark))
+#### [마이페이지(MY PAGE) API](https://github.com/ywoo21/Boogle-Server/wiki/%EB%A7%88%EC%9D%B4%ED%8E%98%EC%9D%B4%EC%A7%80(MY-PAGE)-API)
 #### [네이버 도서 검색(NAVER BOOK API) API]()
+#### [고객의 소리(CUSTOMER INQUIRY) API](https://github.com/ywoo21/Boogle-Server/wiki/%EA%B3%A0%EA%B0%9D%EC%9D%98-%EC%86%8C%EB%A6%AC(Customer-Inquiry)-API)
 
+## Used Skills
 
+- Spring Boot
+- Spring Data JPA / Spring Data MongoDB / Hibernate
+- Spring Security
+- Java JWT
+- Spring Boot Mail
+- Spring Boot Thymeleaf
+- JSON Simple
 
+## Used Database
+
+- MySQL (user)
+- MongoDB (item, sell_item, sell_item_history, transaction, transaction_history, user_bookmark, customer_inquiry, major) 

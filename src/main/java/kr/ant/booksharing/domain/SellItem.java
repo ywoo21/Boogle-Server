@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Data
 @Document("sell_item")
@@ -42,4 +43,17 @@ public class SellItem {
     private String comment;
     private boolean isTraded;
     private String sellerBankAccountId;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SellItem sellItem = (SellItem) o;
+        return itemId.equals(sellItem.itemId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(itemId);
+    }
 }
