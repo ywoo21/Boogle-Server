@@ -7,6 +7,7 @@ import kr.ant.booksharing.repository.ItemReceivingRepository;
 import kr.ant.booksharing.repository.ItemRepository;
 import kr.ant.booksharing.repository.SellItemRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.json.XML;
 import org.json.simple.parser.JSONParser;
@@ -20,8 +21,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static kr.ant.booksharing.model.DefaultRes.FAIL_DEFAULT_RES;
 
@@ -45,7 +45,8 @@ public class NaverBookApiController {
     }
 
     @GetMapping("naver/bookApi/buy/title")
-    public ResponseEntity getAllRegisteredBuyItemsByTitle(@RequestParam(value = "keyword", defaultValue = "") String keyword) {
+    public ResponseEntity getAllRegisteredBuyItemsByTitle(@RequestParam(value = "keyword", defaultValue = "") String keyword,
+                                                          @RequestParam(value = "sortType", defaultValue = "accuracy") String sortType) {
         try {
 
             List<String> itemIdList = new ArrayList<>();
@@ -62,7 +63,7 @@ public class NaverBookApiController {
                     ItemRes itemRes = new ItemRes();
 
                     List<SellItem> sellItemList =
-                            sellItemRepository.findAllByItemId(item.getItemId()).get();
+                            sellItemRepository.findAllByItemIdAndIsTraded(item.getItemId(), false).get();
 
                     SellItem sellItem = sellItemList.get(0);
 
@@ -90,6 +91,8 @@ public class NaverBookApiController {
                     itemResList.add(itemRes);
                 }
             }
+
+            sortSearchedList(itemResList, sortType, keyword);
 
             List<ItemRes> tempItemList = itemResList;
 
@@ -176,7 +179,7 @@ public class NaverBookApiController {
                     ItemRes itemRes = new ItemRes();
 
                     List<SellItem> sellItemList =
-                            sellItemRepository.findAllByItemId(item.getItemId()).get();
+                            sellItemRepository.findAllByItemIdAndIsTraded(item.getItemId(), false).get();
 
                     SellItem sellItem = sellItemList.get(0);
 
@@ -421,6 +424,62 @@ public class NaverBookApiController {
         } catch (Exception e) {
             System.out.println(e);
             return null;
+        }
+    }
+
+    public void sortSearchedList(List<ItemRes> itemResList, String sortType, String keyword){
+
+        // 1) 정확도순 : 일치도 -> 판매량
+        if(sortType.equals("accuracy")){
+            Collections.sort(itemResList, (o1, o2) -> {
+                if(StringUtils.countMatches(o1.getTitle(), keyword)
+                        > StringUtils.countMatches(o2.getTitle(), keyword)){
+                    return -1;
+                }
+                else if(StringUtils.countMatches(o1.getTitle(), keyword)
+                        == StringUtils.countMatches(o2.getTitle(), keyword)){
+                    if(o1.getRegiCount() >= o2.getRegiCount()) return -1;
+                    else return 1;
+                }
+                return 1;
+            });
+        }
+        // 2) 판매량순 : 판매량 -> 출시일
+        else if(sortType.equals("regiCount")){
+            Collections.sort(itemResList, (o1, o2) -> {
+                if(o1.getRegiCount() > o2.getRegiCount()) return -1;
+                else if(o1.getRegiCount() == o2.getRegiCount()){
+                    if(Integer.parseInt(o1.getPubdate()) >= Integer.parseInt(o2.getPubdate())){
+                        return -1;
+                    }
+                    else return 1;
+                }
+                return 1;
+            });
+        }
+        else if(sortType.equals("pubdate")){
+            Collections.sort(itemResList, (o1, o2) -> {
+                if(Integer.parseInt(o1.getPubdate()) > Integer.parseInt(o2.getPubdate())) return -1;
+                else if(Integer.parseInt(o1.getPubdate()) == Integer.parseInt(o2.getPubdate())){
+                    if(o1.getRegiCount() >= o2.getRegiCount()){
+                        return -1;
+                    }
+                    else return 1;
+                }
+                return 1;
+            });
+        }
+        else{
+            Collections.sort(itemResList, (o1, o2) -> {
+                if(Integer.parseInt(o1.getRegiPrice()) < Integer.parseInt(o2.getRegiPrice())) return -1;
+                else if(Integer.parseInt(o1.getRegiPrice()) == Integer.parseInt(o2.getRegiPrice())){
+                    if(o1.getRegiCount() >= o2.getRegiCount()){
+                        return -1;
+                    }
+                    else return 1;
+                }
+                return 1;
+            });
         }
     }
 }
