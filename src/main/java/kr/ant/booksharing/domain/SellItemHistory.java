@@ -44,4 +44,7 @@ public class SellItemHistory {
     private String comment;
     private boolean isTraded;
     private String sellerBankAccountId;
+
+    private String subject;
+    private String professor;
 }

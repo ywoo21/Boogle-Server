@@ -10,5 +10,7 @@ import java.util.Optional;
 public interface ItemRepository extends MongoRepository<Item, String> {
     Optional<Item> findByItemId(String itemId);
     Optional<List<Item>> findAllByTitleContaining(String keyword);
+    Optional<List<Item>> findAllBySubjectListContaining(String keyword);
+    Optional<List<Item>> findAllByTitleOrSubjectListOrProfessorListContaining(String keyword);
     Optional<List<Item>> findByOrderByRegiCountDesc();
 }

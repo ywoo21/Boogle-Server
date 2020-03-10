@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -136,6 +137,18 @@ public class SellItemService {
                 item.set_id(currItem.get_id());
                 item.setItemId(currItem.getItemId());
                 item.setTitle(currItem.getTitle());
+
+                if(!sellItem.getSubject().equals("")){
+                    List<String> subjectList = currItem.getSubjectList();
+                    subjectList.add(sellItem.getSubject());
+                    item.setSubjectList(subjectList);
+                }
+                if(!sellItem.getProfessor().equals("")){
+                    List<String> professorList = currItem.getProfessorList();
+                    professorList.add(sellItem.getProfessor());
+                    item.setProfessorList(professorList);
+                }
+
                 item.setRegiCount(currItem.getRegiCount() + 1);
 
                 itemRepository.save(item);
@@ -144,6 +157,8 @@ public class SellItemService {
             else{
                 item.setItemId(sellItem.getItemId());
                 item.setTitle(sellItem.getTitle());
+                item.setSubjectList(new ArrayList<>(Arrays.asList(sellItem.getSubject())));
+                item.setProfessorList(new ArrayList<>(Arrays.asList(sellItem.getProfessor())));
                 item.setRegiCount(1);
                 itemRepository.save(item);
             }
@@ -171,6 +186,8 @@ public class SellItemService {
                         .sellerId(sellItem.getSellerId())
                         .regiPrice(sellItem.getRegiPrice())
                         .originalPrice(sellItem.getOriginalPrice())
+                            .subject(sellItem.getSubject())
+                            .professor(sellItem.getProfessor())
                         .build();
 
             sellItemHistoryRepository.save(sellItemHistory);
