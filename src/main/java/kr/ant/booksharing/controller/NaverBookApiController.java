@@ -60,13 +60,32 @@ public class NaverBookApiController {
             List<ItemRes> itemResList = new ArrayList<>();
             List<ItemRes> itemNotRegisteredResList = new ArrayList<>();
 
-            if (itemRepository.findAllByTitleContaining(keyword).isPresent()) {
-
-                List<Item> itemList = itemRepository.findAllByTitleContaining(keyword).get();
-
+           //if (itemRepository.findAllByTitleOrSubjectListOrProfessorListContaining(keyword).isPresent()) {
+            if (!itemRepository.findAll().isEmpty()) {
+               //List<Item> itemList = itemRepository.findAllByTitleOrSubjectListOrProfessorListContaining(keyword).get();
+                List<Item> itemList = itemRepository.findAll();
                 for (Item item : itemList) {
 
-                    if (item.getRegiCount() < 1) continue;
+                    boolean isKeywordMatched = false;
+
+                    if(item.getTitle().contains(keyword) || keyword.contains(item.getTitle())) isKeywordMatched = true;
+
+
+                    for(String subject : item.getSubjectList()){
+                        if(subject.contains(keyword) || keyword.contains(subject)){
+                            isKeywordMatched = true;
+                            break;
+                        }
+                    }
+
+                    for(String professor : item.getProfessorList()){
+                        if(professor.contains(keyword) || keyword.contains(professor)){
+                            isKeywordMatched = true;
+                            break;
+                        }
+                    }
+
+                    if(isKeywordMatched == false || item.getRegiCount() < 1) continue;
 
                     ItemRes itemRes = new ItemRes();
 
@@ -161,7 +180,7 @@ public class NaverBookApiController {
                 itemNotRegisteredResList.add(itemRes);
             }
 
-            sortSearchedItemNotRegisteredResList(itemNotRegisteredResList, itemNotRegisteredResListSortType, keyword);
+            sortSearchedItemNotRegisteredResList(itemNotRegisteredResList, itemNotRegisteredResListSortType, keyword, true);
 
             itemAllRes.setItemNotRegisteredResList(itemNotRegisteredResList);
 
@@ -277,7 +296,8 @@ public class NaverBookApiController {
     }
 
     @GetMapping("naver/bookApi/sell/title")
-    public ResponseEntity getAllSearchedSellItemsByTitle(@RequestParam(value = "keyword", defaultValue = "") String keyword) {
+    public ResponseEntity getAllSearchedSellItemsByTitle(@RequestParam(value = "keyword", defaultValue = "") String keyword,
+                                                         @RequestParam(value = "sortType", defaultValue = "accurate") String sortType) {
         try {
 
             String booksFromNaverBookApi = getAllBooksFromNaverBookApi(keyword);
@@ -310,6 +330,7 @@ public class NaverBookApiController {
                     itemRes.setRegiPrice("");
                     itemResList.add(itemRes);
                 }
+                sortSearchedItemNotRegisteredResList(itemResList, sortType, keyword, false);
             } catch (ParseException e) {
 
             }
@@ -488,22 +509,24 @@ public class NaverBookApiController {
         }
     }
 
-    public void sortSearchedItemNotRegisteredResList(List<ItemRes> itemNotRegisteredResList, String sortType, String keyword) {
+    public void sortSearchedItemNotRegisteredResList(List<ItemRes> itemNotRegisteredResList, String sortType, String keyword, boolean isBuy) {
 
         // 1) 정확도순 : 일치도 -> 판매량
         if (sortType.equals("accuracy")) {
-            Collections.sort(itemNotRegisteredResList, (o1, o2) -> {
-                if (StringUtils.countMatches(o1.getTitle(), keyword)
-                        > StringUtils.countMatches(o2.getTitle(), keyword)) {
-                    return -1;
-                } else if (StringUtils.countMatches(o1.getTitle(), keyword)
-                        == StringUtils.countMatches(o2.getTitle(), keyword)) {
-                    if (sellItemHistoryRepository.countByItemId(o1.getItemId()) >=
-                            sellItemHistoryRepository.countByItemId(o2.getItemId())) return -1;
-                    else return 1;
-                }
-                return 1;
-            });
+            if(isBuy){
+                Collections.sort(itemNotRegisteredResList, (o1, o2) -> {
+                    if (StringUtils.countMatches(o1.getTitle(), keyword)
+                            > StringUtils.countMatches(o2.getTitle(), keyword)) {
+                        return -1;
+                    } else if (StringUtils.countMatches(o1.getTitle(), keyword)
+                            == StringUtils.countMatches(o2.getTitle(), keyword)) {
+                        if (sellItemHistoryRepository.countByItemId(o1.getItemId()) >=
+                                sellItemHistoryRepository.countByItemId(o2.getItemId())) return -1;
+                        else return 1;
+                    }
+                    return 1;
+                });
+            }
         }
         // 2) 판매량순 : 판매량 -> 출시일
         else if (sortType.equals("regiCount")) {

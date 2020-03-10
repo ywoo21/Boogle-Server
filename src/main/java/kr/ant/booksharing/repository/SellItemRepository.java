@@ -15,7 +15,7 @@ import java.util.Optional;
 public interface SellItemRepository extends MongoRepository<SellItem, String> {
     Optional<SellItem> findBy_id(String id);
     Optional<List<SellItem>> findAllByItemId(String itemId);
-    Optional<List<SellItem>> findAllByTitleContaining(String keyword);
+    Optional<List<SellItem>> findAllByTitleContainingAndIsTraded(String keyword, boolean isTraded);
 
     @Query("{ 'title' : ?0 }")
     List<SellItem> findAllGroupByItemIdContaining(String keyword);

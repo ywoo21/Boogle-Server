@@ -44,6 +44,9 @@ public class SellItem {
     private boolean isTraded;
     private String sellerBankAccountId;
 
+    private String subject;
+    private String professor;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
