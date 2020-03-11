@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import java.util.List;
 
 @Data
 @Document("item")
@@ -17,5 +18,9 @@ public class Item {
 
     private String itemId;
     private String title;
+
+    private List<String> subjectList;
+    private List<String> professorList;
+
     private int regiCount;
 }

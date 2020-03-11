@@ -10,7 +10,7 @@ import java.util.List;
 @Builder
 public class TransactionItem {
     private String sellItemId;
-    private String traderName;
+    private String traderNickname;
     private String traderPhoneNumber;
     private String title;
     private int transactionType;

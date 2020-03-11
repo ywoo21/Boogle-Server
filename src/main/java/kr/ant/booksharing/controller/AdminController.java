@@ -1,5 +1,6 @@
 package kr.ant.booksharing.controller;
 
+import kr.ant.booksharing.service.BoogleBoxService;
 import kr.ant.booksharing.service.TransactionService;
 import kr.ant.booksharing.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -15,11 +16,14 @@ import static kr.ant.booksharing.model.DefaultRes.FAIL_DEFAULT_RES;
 public class AdminController {
     private final UserService userService;
     private final TransactionService transactionService;
+    private final BoogleBoxService boogleBoxService;
 
     public AdminController(final UserService userService,
-                           final TransactionService transactionService) {
+                           final TransactionService transactionService,
+                           final BoogleBoxService boogleBoxService) {
         this.userService = userService;
         this.transactionService = transactionService;
+        this.boogleBoxService = boogleBoxService;
     }
 
     /**
@@ -58,7 +62,7 @@ public class AdminController {
      *
      * @return ResponseEntity
      */
-    @GetMapping("/transactions/step_two")
+    @GetMapping("/transactions/stepTwo")
     public ResponseEntity getAllStepTwoTransaction(){
         try {
             return new ResponseEntity<>(transactionService.findAllStepTwoTransaction(), HttpStatus.OK);
@@ -69,14 +73,14 @@ public class AdminController {
     }
 
     /**
-     * step5 거래 정보 목록 열람
+     * step4 거래 정보 목록 열람
      *
      * @return ResponseEntity
      */
-    @GetMapping("/transactions/step_five")
-    public ResponseEntity getAllStepFiveTransaction(){
+    @GetMapping("/transactions/stepFour")
+    public ResponseEntity getAllStepFourTransaction(){
         try {
-            return new ResponseEntity<>(transactionService.findAllStepFiveTransaction(), HttpStatus.OK);
+            return new ResponseEntity<>(transactionService.findAllStepFourTransaction(), HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
@@ -95,6 +99,51 @@ public class AdminController {
         } catch (Exception e) {
             log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
+     * 구매자 이름 조회
+     *
+     * @return ResponseEntity
+     */
+    @GetMapping("/buyerName")
+    public ResponseEntity getBuyerName(@RequestParam("userId")final int userId) {
+        try {
+            return new ResponseEntity<>(transactionService.findBuyerName(userId),HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("{}", e);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
+     * 판매자 계좌 정보 조회
+     *
+     * @return ResponseEntity
+     */
+    @GetMapping("/sellerBankAccount")
+    public ResponseEntity getSellerBankAccount(@RequestParam("sellItemId")final String sellItemId) {
+        try {
+            return new ResponseEntity<>(transactionService.findSellerBankAccount(sellItemId),HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("{}", e);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
+     * 북을박스 전체 정보 조회
+     *
+     * @return ResponseEntity
+     */
+    @GetMapping("/booglebox")
+    public ResponseEntity getAllBoogleBox(){
+        try{
+            return new ResponseEntity<>(boogleBoxService.findAllBoogleBoxes(), HttpStatus.OK);
+        } catch (Exception e){
+            log.error("{}", e);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 }

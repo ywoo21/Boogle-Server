@@ -1,9 +1,5 @@
 package kr.ant.booksharing.controller;
 
-import kr.ant.booksharing.domain.SellItem;
-import kr.ant.booksharing.model.Book.BookRes;
-import kr.ant.booksharing.model.DefaultRes;
-import kr.ant.booksharing.model.HomeRes;
 import kr.ant.booksharing.service.HomeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -12,7 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 
 import static kr.ant.booksharing.model.DefaultRes.FAIL_DEFAULT_RES;
 

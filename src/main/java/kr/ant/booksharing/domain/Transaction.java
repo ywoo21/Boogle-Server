@@ -30,4 +30,6 @@ public class Transaction {
 
     private String boxId;
     private String boxPassword;
+
+    private boolean isPaymentDone;
 }

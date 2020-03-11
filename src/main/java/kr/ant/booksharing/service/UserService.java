@@ -1,10 +1,8 @@
 package kr.ant.booksharing.service;
 
 import kr.ant.booksharing.domain.User;
-import kr.ant.booksharing.model.DefaultRes;
+import kr.ant.booksharing.model.*;
 import kr.ant.booksharing.model.SignIn.SignInReq;
-import kr.ant.booksharing.model.UserModificationReq;
-import kr.ant.booksharing.model.UserModificationRes;
 import kr.ant.booksharing.repository.UserRepository;
 import kr.ant.booksharing.utils.ResponseMessage;
 import kr.ant.booksharing.utils.StatusCode;
@@ -55,7 +53,7 @@ public class UserService {
         try {
             String encodedPassword = passwordEncoder.encode(user.getPassword());
             user.setPassword(encodedPassword);
-            System.out.println(user.toString());
+
             int userId = userRepository.save(user).getId();
 
             final JwtService.TokenRes tokenRes =
@@ -82,7 +80,14 @@ public class UserService {
                     if(passwordEncoder.matches(signInReq.getPassword(), user.getPassword())){
                         final JwtService.TokenRes tokenRes =
                                 new JwtService.TokenRes(jwtService.create(user.getId()));
-                        return DefaultRes.res(StatusCode.OK, "로그인 성공",tokenRes.getToken());
+
+                        SignInRes signInRes =
+                                SignInRes.builder()
+                                        .token(tokenRes.getToken())
+                                        .isAuthComplete(user.isAuthComplete())
+                                        .build();
+
+                        return DefaultRes.res(StatusCode.OK, "로그인 성공",signInRes);
                     }
                     else { return DefaultRes.res(StatusCode.NOT_FOUND, "로그인 실패 ");}
                 }
@@ -98,7 +103,14 @@ public class UserService {
                                 user.getEmail().split("@")[0].equals(signInReq.getEmail())){
                             final JwtService.TokenRes tokenRes =
                                     new JwtService.TokenRes(jwtService.create(user.getId()));
-                            return DefaultRes.res(StatusCode.OK, "로그인 성공",tokenRes.getToken());
+
+                            SignInRes signInRes =
+                                    SignInRes.builder()
+                                            .token(tokenRes.getToken())
+                                            .isAuthComplete(user.isAuthComplete())
+                                            .build();
+
+                            return DefaultRes.res(StatusCode.OK, "로그인 성공",signInRes);
                         }
                     }
                     return DefaultRes.res(StatusCode.NOT_FOUND, "로그인 실패 ");
@@ -199,7 +211,7 @@ public class UserService {
             String content = mailContentBuilderService.buildEmailAuth(userName, code);
 
             MimeMessagePreparator messagePreparator =
-                    mailSenderService.createMimeMessage(campusEmail, "북을 이메일 인증", content);
+                    mailSenderService.createMimeMessage(campusEmail, "[북을] 회원가입 인증", content);
 
             javaMailSender.send(messagePreparator);
             return DefaultRes.res(StatusCode.OK, "메일 전송 성공");

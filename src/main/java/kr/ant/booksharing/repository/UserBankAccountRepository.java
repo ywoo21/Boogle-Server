@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface UserBankAccountRepository extends MongoRepository<UserBankAccount, String> {
     Optional<List<UserBankAccount>> findAllByUserId(final int userId);
+    Optional<UserBankAccount> findBy_id(final String id);
 }

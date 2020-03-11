@@ -69,7 +69,22 @@ public class TransactionController {
     @PostMapping("/booglebox")
     public ResponseEntity changeTransactionStep(@RequestBody BoogleBoxInfo boogleBoxInfo) {
         try {
-            return new ResponseEntity<>(transactionService.saveBoogleBoxIdAndPassword(boogleBoxInfo),HttpStatus.OK);
+            return new ResponseEntity<>(transactionService.saveBoogleBoxIdAndPasswordAndChangeStep(boogleBoxInfo),HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("{}", e);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
+     * 결제 완료 상태 저장 및
+     *
+     * @return ResponseEntity
+     */
+    @GetMapping("/payment")
+    public ResponseEntity savePaymentDone(@RequestParam("sellItemId") String sellItemId) {
+        try {
+            return new ResponseEntity<>(transactionService.savePaymentDoneAndChangeStep(sellItemId),HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);

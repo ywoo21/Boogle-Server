@@ -6,14 +6,15 @@ import kr.ant.booksharing.domain.SellItemHistory;
 import kr.ant.booksharing.domain.User;
 import kr.ant.booksharing.model.*;
 import kr.ant.booksharing.repository.*;
-import kr.ant.booksharing.utils.ResponseMessage;
 import kr.ant.booksharing.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -22,7 +23,6 @@ public class SellItemService {
 
     private final SellItemRepository sellItemRepository;
     private final SellItemHistoryRepository sellItemHistoryRepository;
-    private final RegiImageRepository regiImageRepository;
     private final S3FileUploadService s3FileUploadService;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
@@ -40,7 +40,6 @@ public class SellItemService {
         this.sellItemRepository = sellItemRepository;
         this.sellItemHistoryRepository = sellItemHistoryRepository;
         this.s3FileUploadService = s3FileUploadService;
-        this.regiImageRepository = regiImageRepository;
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
         this.userBookmarkRepository = userBookmarkRepository;
@@ -55,9 +54,9 @@ public class SellItemService {
      */
     public DefaultRes<List<SellItem>> findAllSellItems(final String itemId) {
 
-        if(sellItemRepository.findAllByItemId(itemId).isPresent()){
+        if(sellItemRepository.findAllByItemIdAndIsTraded(itemId,false).isPresent()){
 
-            List<SellItem> sellItemList = sellItemRepository.findAllByItemId(itemId).get();
+            List<SellItem> sellItemList = sellItemRepository.findAllByItemIdAndIsTraded(itemId, false).get();
 
             return DefaultRes.res(StatusCode.OK, "판매 상품 조회 성공", sellItemList);
 
@@ -120,6 +119,15 @@ public class SellItemService {
 
             sellItem.setRegiImageUrlList(regiImageUrlList);
 
+            int originalPrice = Integer.parseInt(sellItem.getOriginalPrice());
+
+            if(sellItem.getDealType() == 0){
+                sellItem.setRegiPrice(sellItem.getOriginalPrice());
+            }
+            else{
+                sellItem.setRegiPrice(Integer.toString(originalPrice + 500));
+            }
+
             Item item = new Item();
             if(itemRepository.findByItemId(sellItem.getItemId()).isPresent()){
 
@@ -129,6 +137,18 @@ public class SellItemService {
                 item.set_id(currItem.get_id());
                 item.setItemId(currItem.getItemId());
                 item.setTitle(currItem.getTitle());
+
+                if(!sellItem.getSubject().equals("")){
+                    List<String> subjectList = currItem.getSubjectList();
+                    subjectList.add(sellItem.getSubject());
+                    item.setSubjectList(subjectList);
+                }
+                if(!sellItem.getProfessor().equals("")){
+                    List<String> professorList = currItem.getProfessorList();
+                    professorList.add(sellItem.getProfessor());
+                    item.setProfessorList(professorList);
+                }
+
                 item.setRegiCount(currItem.getRegiCount() + 1);
 
                 itemRepository.save(item);
@@ -137,9 +157,12 @@ public class SellItemService {
             else{
                 item.setItemId(sellItem.getItemId());
                 item.setTitle(sellItem.getTitle());
+                item.setSubjectList(new ArrayList<>(Arrays.asList(sellItem.getSubject())));
+                item.setProfessorList(new ArrayList<>(Arrays.asList(sellItem.getProfessor())));
                 item.setRegiCount(1);
                 itemRepository.save(item);
             }
+
 
             String id = sellItemRepository.save(sellItem).get_id();
 
@@ -155,13 +178,16 @@ public class SellItemService {
                         .price(sellItem.getPrice())
                         .pubdate(sellItem.getPubdate())
                         .publisher(sellItem.getPublisher())
-                        .qualityIn(sellItem.getQualityIn())
-                        .qualityOut(sellItem.getQualityOut())
+                        .qualityGeneral(sellItem.getQualityGeneral())
+                        .qualityExtraList(sellItem.getQualityExtraList())
                         .regiImageUrlList(sellItem.getRegiImageUrlList())
                         .title(sellItem.getTitle())
                         .regiTime(sellItem.getRegiTime())
                         .sellerId(sellItem.getSellerId())
                         .regiPrice(sellItem.getRegiPrice())
+                        .originalPrice(sellItem.getOriginalPrice())
+                            .subject(sellItem.getSubject())
+                            .professor(sellItem.getProfessor())
                         .build();
 
             sellItemHistoryRepository.save(sellItemHistory);

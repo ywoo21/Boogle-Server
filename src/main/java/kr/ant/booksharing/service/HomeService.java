@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -61,8 +62,8 @@ public class HomeService {
      */
     public List<SellItem> findRecentRegisteredSellItemList() {
         List<SellItem> recentRegisteredSellItemList = new ArrayList<>();
-        if(sellItemRepository.findTop4ByOrderByRegiTimeDesc().isPresent()){
-            recentRegisteredSellItemList.addAll(sellItemRepository.findTop4ByOrderByRegiTimeDesc().get());
+        if(sellItemRepository.findTop4ByIsTradedOrderByRegiTimeDesc(false).isPresent()){
+            recentRegisteredSellItemList.addAll(sellItemRepository.findTop4ByIsTradedOrderByRegiTimeDesc(false).get());
         }
         return recentRegisteredSellItemList;
     }
@@ -75,8 +76,8 @@ public class HomeService {
      */
     public List<SellItem> findLowestPriceSellItemList() {
         List<SellItem> recentRegisteredSellItemList = new ArrayList<>();
-        if(sellItemRepository.findTop4ByOrderByRegiPriceAsc().isPresent()){
-            recentRegisteredSellItemList.addAll(sellItemRepository.findTop4ByOrderByRegiPriceAsc().get());
+        if(sellItemRepository.findTop4ByIsTradedOrderByRegiPriceAsc(false).isPresent()){
+            recentRegisteredSellItemList.addAll(sellItemRepository.findTop4ByIsTradedOrderByRegiPriceAsc(false).get());
         }
         return recentRegisteredSellItemList;
     }
@@ -96,11 +97,15 @@ public class HomeService {
 
             for(Item item : mostRegisteredItemList){
                 if(recentRegisteredSellItemList.size() > 3) break;
-                if(sellItemRepository.findAllByItemId(item.getItemId()).isPresent()){
-                    recentRegisteredSellItemList.addAll(sellItemRepository.findAllByItemId(item.getItemId()).get());
+                if(sellItemRepository.findAllByItemIdAndIsTraded(item.getItemId(), false).isPresent()){
+                    recentRegisteredSellItemList.addAll(sellItemRepository.findAllByItemIdAndIsTraded(item.getItemId(), false).get());
                 }
             }
         }
+
+        recentRegisteredSellItemList =
+                recentRegisteredSellItemList.stream().distinct().collect(Collectors.toList());
+
         return recentRegisteredSellItemList;
     }
 }
