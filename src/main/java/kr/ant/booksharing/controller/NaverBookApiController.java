@@ -55,6 +55,10 @@ public class NaverBookApiController {
                                                           @RequestParam(value = "itemNotRegisteredResListSortType", defaultValue = "accuracy") String itemNotRegisteredResListSortType) {
         try {
 
+            if (keyword.equals("")) {
+                return new ResponseEntity<>(ItemAllRes.builder().itemResList(new ArrayList<>()).itemNotRegisteredResList(new ArrayList<>()).build(),HttpStatus.OK);
+            }
+
             List<String> itemIdList = new ArrayList<>();
 
             List<ItemRes> itemResList = new ArrayList<>();
@@ -72,6 +76,7 @@ public class NaverBookApiController {
 
 
                     for(String subject : item.getSubjectList()){
+                        if(subject == null || subject.equals("") || subject.length() == 0) break;
                         if(subject.contains(keyword) || keyword.contains(subject)){
                             isKeywordMatched = true;
                             break;
@@ -79,6 +84,7 @@ public class NaverBookApiController {
                     }
 
                     for(String professor : item.getProfessorList()){
+                        if(professor == null || professor.equals("") || professor.length() == 0) break;
                         if(professor.contains(keyword) || keyword.contains(professor)){
                             isKeywordMatched = true;
                             break;
@@ -197,6 +203,7 @@ public class NaverBookApiController {
 
             List<String> itemIdList = new ArrayList<>();
             List<ItemRes> itemResList = new ArrayList<>();
+            List<ItemRes> itemNotRegisteredResList = new ArrayList<>();
 
             if (itemRepository.findAllByTitleContaining(keyword).isPresent()) {
 
@@ -237,6 +244,9 @@ public class NaverBookApiController {
                     itemResList.add(itemRes);
                 }
             }
+
+            ItemAllRes itemAllRes =
+                    ItemAllRes.builder().itemResList(itemResList).itemNotRegisteredResList(new ArrayList<>()).build();
 
             List<ItemRes> tempItemList = itemResList;
 
@@ -288,7 +298,9 @@ public class NaverBookApiController {
 
             }
 
-            return new ResponseEntity<>(itemResList, HttpStatus.OK);
+            itemAllRes.setItemNotRegisteredResList(itemNotRegisteredResList);
+
+            return new ResponseEntity<>(itemAllRes, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
